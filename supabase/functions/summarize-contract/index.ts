@@ -128,16 +128,13 @@ Deno.serve(async (req) => {
     }
     const extracted = JSON.parse(textBlock.text);
 
+    // The client created the review_queue item at upload time; this function only
+    // pre-fills the draft. Admin approval flips status via the reflection trigger.
     const { error: updateError } = await supabase
       .from("contract_summaries")
       .update({ extracted, status: "ai_draft" })
       .eq("id", summary.id);
     if (updateError) throw updateError;
-
-    // One review item per summary; admin approval flips status via the reflection trigger.
-    await supabase
-      .from("review_queue")
-      .insert({ type: "contract_summary", subject_id: summary.id });
 
     return Response.json({ ok: true, extracted });
   } catch (err) {

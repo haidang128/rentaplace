@@ -337,6 +337,13 @@ export const demoStore = {
     return s.contractSummaries.find((c) => c.listingId === listingId) ?? null;
   },
 
+  async updateContractDraft(listingId: string, extracted: ContractExtract) {
+    const s = await load();
+    const summary = s.contractSummaries.find((c) => c.listingId === listingId);
+    if (summary) summary.extracted = extracted;
+    await save();
+  },
+
   async submitContract(listingId: string, listingLabel: string, extracted: ContractExtract) {
     const s = await load();
     const existing = s.contractSummaries.find((c) => c.listingId === listingId);

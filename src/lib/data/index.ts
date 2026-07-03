@@ -419,7 +419,7 @@ export async function submitContract(
   contractFilePath: string,
 ): Promise<void> {
   if (isDemoMode) {
-    // Demo: fabricate a plausible draft from the listing (real mode runs Claude in the Edge Function).
+    // Demo: prefill a draft from the listing; the admin edits it in the review form.
     await demoStore.submitContract(listing.id, listing.title, {
       rentPcm: listing.pricePcm,
       rentDueDay: 1,
@@ -439,10 +439,53 @@ export async function submitContract(
     .select("id")
     .single();
   if (error) throw error;
-  const { error: fnError } = await supabase!.functions.invoke("summarize-contract", {
-    body: { summary_id: data.id },
-  });
-  if (fnError) throw fnError;
+  await supabase!.from("review_queue").insert({ type: "contract_summary", subject_id: data.id });
+  // AI pre-fill is optional: if the Edge Function isn't deployed (no Anthropic key),
+  // the admin fills the summary manually in the review form.
+  try {
+    await supabase!.functions.invoke("summarize-contract", { body: { summary_id: data.id } });
+  } catch {
+    // manual path — admin enters the fields in the queue
+  }
+}
+
+/** Draft summary for the admin review form. subjectId = listing id (demo) / summary id (live). */
+export async function getContractDraft(subjectId: string): Promise<ContractExtract | null> {
+  if (isDemoMode) {
+    const summary = await demoStore.getContractSummary(subjectId);
+    return summary?.extracted ?? null;
+  }
+  const { data, error } = await supabase!
+    .from("contract_summaries")
+    .select("extracted")
+    .eq("id", subjectId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapExtract(data.extracted) : null;
+}
+
+export async function saveContractDraft(subjectId: string, extracted: ContractExtract): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.updateContractDraft(subjectId, extracted);
+    return;
+  }
+  const { error } = await supabase!
+    .from("contract_summaries")
+    .update({
+      extracted: {
+        rent_pcm: extracted.rentPcm,
+        rent_due_day: extracted.rentDueDay,
+        bills_included: extracted.billsIncluded,
+        deposit_amount: extracted.depositAmount,
+        scheme_mentioned: extracted.scheme,
+        notice_months: extracted.noticeMonths,
+        term_type: extracted.termType,
+        is_lodger_agreement: extracted.isLodgerAgreement,
+        unusual_clauses: extracted.unusualClauses,
+      },
+    })
+    .eq("id", subjectId);
+  if (error) throw error;
 }
 
 // ── M4: chat ─────────────────────────────────────────────────────────────────

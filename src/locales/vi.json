@@ -334,6 +334,19 @@
     "typeCertificate": "Chứng chỉ bảo vệ cọc",
     "typePhotos": "Ảnh + tin đăng",
     "typeContract": "Tóm tắt hợp đồng",
-    "resolved": "Đã xử lý"
+    "resolved": "Đã xử lý",
+    "contractFormTitle": "Điền tóm tắt hợp đồng",
+    "contractFormHint": "Đọc hợp đồng PDF rồi điền — người thuê sẽ thấy đúng những gì bạn nhập.",
+    "fieldRent": "Tiền thuê £/tháng",
+    "fieldRentDay": "Ngày trả tiền (1–28)",
+    "fieldDeposit": "Tiền cọc £",
+    "fieldNotice": "Báo trước (tháng)",
+    "fieldScheme": "Chương trình bảo vệ cọc ghi trong hợp đồng",
+    "schemeNone": "Không ghi",
+    "fieldBills": "Đã gồm hoá đơn",
+    "fieldTermPeriodic": "Hợp đồng định kỳ (không thời hạn cố định)",
+    "fieldLodger": "Hợp đồng lodger (chủ nhà sống cùng)",
+    "fieldClauses": "Điều khoản bất thường (mỗi dòng một mục, để trống nếu không có)",
+    "saveApprove": "Lưu + Duyệt"
   }
 }

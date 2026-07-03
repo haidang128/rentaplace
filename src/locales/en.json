@@ -334,6 +334,19 @@
     "typeCertificate": "Deposit certificate",
     "typePhotos": "Photos + listing",
     "typeContract": "Contract summary",
-    "resolved": "Resolved"
+    "resolved": "Resolved",
+    "contractFormTitle": "Fill in the contract summary",
+    "contractFormHint": "Read the contract PDF and fill this in — renters see exactly what you enter.",
+    "fieldRent": "Rent £/month",
+    "fieldRentDay": "Rent due day (1–28)",
+    "fieldDeposit": "Deposit £",
+    "fieldNotice": "Notice (months)",
+    "fieldScheme": "Protection scheme named in the contract",
+    "schemeNone": "Not stated",
+    "fieldBills": "Bills included",
+    "fieldTermPeriodic": "Periodic tenancy (no fixed term)",
+    "fieldLodger": "Lodger agreement (live-in landlord)",
+    "fieldClauses": "Unusual clauses (one per line, leave empty if none)",
+    "saveApprove": "Save + Approve"
   }
 }

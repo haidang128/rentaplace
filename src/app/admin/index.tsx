@@ -2,6 +2,7 @@ import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
+import { ContractReviewForm } from "@/components/contract-review-form";
 import { PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
@@ -91,27 +92,49 @@ export default function AdminQueueScreen() {
           <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 15, color: palette.ink }}>
             {item.subjectLabel}
           </Text>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <View style={{ flex: 1 }}>
-              <PrimaryButton
-                label={t("admin.approve")}
-                tone="green"
-                onPress={async () => {
-                  await resolveReview(item.id, "approved");
-                  refresh();
-                }}
-              />
+
+          {item.type === "contract_summary" ? (
+            // Contract items: the admin fills in (or corrects) the summary before approving.
+            <ContractReviewForm
+              subjectId={item.subjectId}
+              onApprove={async () => {
+                await resolveReview(item.id, "approved");
+                refresh();
+              }}
+            />
+          ) : (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <PrimaryButton
+                  label={t("admin.approve")}
+                  tone="green"
+                  onPress={async () => {
+                    await resolveReview(item.id, "approved");
+                    refresh();
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <PrimaryButton
+                  label={t("admin.reject")}
+                  onPress={async () => {
+                    await resolveReview(item.id, "rejected");
+                    refresh();
+                  }}
+                />
+              </View>
             </View>
-            <View style={{ flex: 1 }}>
-              <PrimaryButton
-                label={t("admin.reject")}
-                onPress={async () => {
-                  await resolveReview(item.id, "rejected");
-                  refresh();
-                }}
-              />
-            </View>
-          </View>
+          )}
+
+          {item.type === "contract_summary" ? (
+            <PrimaryButton
+              label={t("admin.reject")}
+              onPress={async () => {
+                await resolveReview(item.id, "rejected");
+                refresh();
+              }}
+            />
+          ) : null}
         </View>
       )}
     />
