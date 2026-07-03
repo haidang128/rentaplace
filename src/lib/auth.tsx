@@ -42,9 +42,8 @@ type AuthContextValue = {
   ready: boolean;
   /** Demo mode only: sign in as a seeded persona. */
   signInDemo: (persona: keyof typeof demoPersonas) => void;
-  /** Real mode: email OTP via Supabase. */
-  sendOtp: (email: string) => Promise<void>;
-  verifyOtp: (email: string, code: string) => Promise<void>;
+  /** Real mode: email + password. Signs up automatically on first login (auto-confirm is on). */
+  signInWithPassword: (email: string, password: string) => Promise<void>;
   /** Real mode: renter -> landlord self-serve upgrade (server-enforced, never admin). */
   becomeLandlord: () => Promise<void>;
   signOut: () => void;
@@ -85,16 +84,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(s)).catch(() => {});
   }, []);
 
-  const sendOtp = useCallback(async (email: string) => {
+  const signInWithPassword = useCallback(async (email: string, password: string) => {
     if (isDemoMode) return;
-    const { error } = await supabase!.auth.signInWithOtp({ email });
-    if (error) throw error;
-  }, []);
-
-  const verifyOtp = useCallback(async (email: string, code: string) => {
-    if (isDemoMode) return;
-    const { error } = await supabase!.auth.verifyOtp({ email, token: code, type: "email" });
-    if (error) throw error;
+    const { error } = await supabase!.auth.signInWithPassword({ email, password });
+    if (!error) return;
+    // First visit: create the account (auto-confirm returns a session immediately).
+    if (error.message.toLowerCase().includes("invalid login credentials")) {
+      const { data, error: signUpError } = await supabase!.auth.signUp({ email, password });
+      if (signUpError) throw signUpError;
+      if (!data.session) throw error; // existing account, wrong password
+      return;
+    }
+    throw error;
   }, []);
 
   const becomeLandlord = useCallback(async () => {
@@ -115,8 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ session, ready, signInDemo, sendOtp, verifyOtp, becomeLandlord, signOut }),
-    [session, ready, signInDemo, sendOtp, verifyOtp, becomeLandlord, signOut],
+    () => ({ session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut }),
+    [session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

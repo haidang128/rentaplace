@@ -270,10 +270,9 @@
   },
   "auth": {
     "signInTitle": "Sign in",
-    "signInBody": "Enter your email — we send a 6-digit code, no password needed.",
-    "sendCode": "Send code",
-    "codePlaceholder": "6-digit code",
-    "verify": "Verify",
+    "signInBody": "Enter your email and password. On your first sign-in the account is created automatically.",
+    "password": "Password (min 6 characters)",
+    "passwordHint": "No account yet? Just fill it in — we create your account on first sign-in.",
     "signOut": "Sign out",
     "signedInAs": "Signed in as:",
     "demoTitle": "Demo build — pick a role to explore",

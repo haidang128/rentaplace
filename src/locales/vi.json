@@ -270,10 +270,9 @@
   },
   "auth": {
     "signInTitle": "Đăng nhập",
-    "signInBody": "Nhập email — chúng tôi gửi mã 6 số, không cần mật khẩu.",
-    "sendCode": "Gửi mã",
-    "codePlaceholder": "Mã 6 số",
-    "verify": "Xác nhận",
+    "signInBody": "Nhập email và mật khẩu. Lần đầu đăng nhập, tài khoản được tạo tự động.",
+    "password": "Mật khẩu (tối thiểu 6 ký tự)",
+    "passwordHint": "Chưa có tài khoản? Cứ điền — chúng tôi tạo tài khoản cho bạn ngay lần đầu.",
     "signOut": "Đăng xuất",
     "signedInAs": "Đang đăng nhập:",
     "demoTitle": "Bản dùng thử — chọn vai để khám phá",

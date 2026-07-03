@@ -70,7 +70,7 @@ export default function ProfileScreen() {
       ) : isDemoMode ? (
         <DemoSignIn />
       ) : (
-        <EmailOtpSignIn />
+        <EmailPasswordSignIn />
       )}
 
       <Pressable
@@ -164,12 +164,12 @@ function DemoSignIn() {
   );
 }
 
-function EmailOtpSignIn() {
+function EmailPasswordSignIn() {
   const { t } = useLang();
-  const { sendOtp, verifyOtp } = useAuth();
+  const { signInWithPassword } = useAuth();
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [stage, setStage] = useState<"email" | "code">("email");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   return (
@@ -177,52 +177,38 @@ function EmailOtpSignIn() {
       <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 22, color: palette.inkSoft }}>
         {t("auth.signInBody")}
       </Text>
-      {stage === "email" ? (
-        <>
-          <LabeledInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            inputMode="email"
-            autoCapitalize="none"
-          />
-          <PrimaryButton
-            label={t("auth.sendCode")}
-            disabled={!email.includes("@")}
-            onPress={async () => {
-              try {
-                setError(null);
-                await sendOtp(email.trim());
-                setStage("code");
-              } catch (e: any) {
-                setError(String(e?.message ?? e));
-              }
-            }}
-          />
-        </>
-      ) : (
-        <>
-          <LabeledInput
-            label={t("auth.codePlaceholder")}
-            value={code}
-            onChangeText={setCode}
-            inputMode="numeric"
-            maxLength={6}
-          />
-          <PrimaryButton
-            label={t("auth.verify")}
-            disabled={code.length !== 6}
-            onPress={async () => {
-              try {
-                setError(null);
-                await verifyOtp(email.trim(), code.trim());
-              } catch (e: any) {
-                setError(String(e?.message ?? e));
-              }
-            }}
-          />
-        </>
-      )}
+      <LabeledInput
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        inputMode="email"
+        autoCapitalize="none"
+      />
+      <LabeledInput
+        label={t("auth.password")}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoCapitalize="none"
+      />
+      <PrimaryButton
+        label={t("auth.signInTitle")}
+        disabled={!email.includes("@") || password.length < 6 || busy}
+        onPress={async () => {
+          setBusy(true);
+          try {
+            setError(null);
+            await signInWithPassword(email.trim(), password);
+          } catch (e: any) {
+            setError(String(e?.message ?? e));
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+      <Text style={{ fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: palette.inkMuted }}>
+        {t("auth.passwordHint")}
+      </Text>
       {error ? (
         <Text selectable style={{ fontFamily: fonts.sans, fontSize: 13, color: palette.brick }}>
           {error}
