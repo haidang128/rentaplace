@@ -1,7 +1,7 @@
 import * as DocumentPicker from "expo-document-picker";
 import { Redirect, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Alert, FlatList, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
@@ -11,6 +11,7 @@ import { demoStore } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 import { isDemoMode } from "@/lib/supabase";
 import type { Listing } from "@/lib/types";
+import { uploadToBucket } from "@/lib/upload";
 
 type ContractState = "none" | "pending" | "approved";
 
@@ -116,8 +117,19 @@ export default function MyListingsScreen() {
                     onPress={async () => {
                       const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf" });
                       if (result.canceled || !result.assets[0]) return;
-                      await submitContract(item, result.assets[0].name);
-                      refresh();
+                      try {
+                        const storagePath = await uploadToBucket(
+                          "contracts",
+                          `${item.id}/${Date.now()}-contract.pdf`,
+                          result.assets[0].uri,
+                          "application/pdf",
+                        );
+                        await submitContract(item, storagePath);
+                        Alert.alert("✓", t("onboarding.uploadSuccess"));
+                        refresh();
+                      } catch (e: any) {
+                        Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+                      }
                     }}
                   />
                 </>

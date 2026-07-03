@@ -2,6 +2,7 @@ import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
+import { AdminReviewDetails } from "@/components/admin-review-details";
 import { ContractReviewForm } from "@/components/contract-review-form";
 import { PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
@@ -92,6 +93,9 @@ export default function AdminQueueScreen() {
           <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 15, color: palette.ink }}>
             {item.subjectLabel}
           </Text>
+
+          {/* What's being reviewed: listing details, or the uploaded document */}
+          <AdminReviewDetails item={item} />
 
           {item.type === "contract_summary" ? (
             // Contract items: the admin fills in (or corrects) the summary before approving.

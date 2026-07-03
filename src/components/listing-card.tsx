@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
@@ -41,9 +42,18 @@ export function ListingCard({
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontSize: 10, color: palette.inkFaint }}>
-            {t("landing.hero.cardPhotoPlaceholder")}
-          </Text>
+          {listing.photoUrls.length > 0 ? (
+            <Image
+              source={{ uri: listing.photoUrls[0] }}
+              style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+              contentFit="cover"
+              transition={150}
+            />
+          ) : (
+            <Text style={{ fontSize: 10, color: palette.inkFaint }}>
+              {t("landing.hero.cardPhotoPlaceholder")}
+            </Text>
+          )}
           <View
             style={{
               position: "absolute",

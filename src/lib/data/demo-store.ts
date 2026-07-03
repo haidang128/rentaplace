@@ -14,6 +14,8 @@ export type VerificationState = {
   rightToLetStatus: "none" | "submitted" | "approved" | "rejected";
   schemeDeclared: DepositScheme | null;
   certificateStatus: "none" | "submitted" | "approved" | "rejected";
+  /** Display names of the uploaded files, keyed by doc kind. */
+  files?: Partial<Record<"identity" | "right_to_let" | "certificate", string>>;
 };
 
 export type Conversation = {
@@ -221,6 +223,13 @@ export const demoStore = {
         createdAt: new Date().toISOString(),
       });
     }
+    await save();
+  },
+
+  async setListingPhotos(listingId: string, photoUrls: string[]) {
+    const s = await load();
+    const listing = s.createdListings.find((l) => l.id === listingId);
+    if (listing) listing.photoUrls = photoUrls;
     await save();
   },
 

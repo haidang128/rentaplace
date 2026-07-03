@@ -11,6 +11,7 @@ import {
 } from "@/lib/data/demo-store";
 import { isDemoMode, supabase } from "@/lib/supabase";
 import type { DepositScheme, Landlord, Listing, Review, TrustTier } from "@/lib/types";
+import { publicPhotoUrl, uploadToBucket } from "@/lib/upload";
 
 /**
  * Data access layer. Every screen goes through these functions; they hit
@@ -37,7 +38,7 @@ function mapListing(row: any): Listing {
     photosCheckedAt: row.photos_checked_at,
     photoUrls: (row.listing_photos ?? [])
       .sort((a: any, b: any) => a.sort_order - b.sort_order)
-      .map((p: any) => p.path),
+      .map((p: any) => publicPhotoUrl(p.path)),
   };
 }
 
@@ -149,6 +150,10 @@ export async function getLandlordReviews(landlordId: string): Promise<Review[]> 
 
 // ── M2: landlord verification, listings, admin queue ────────────────────────
 
+function fileLabel(path: string | null): string | undefined {
+  return path ? path.split("/").pop() : undefined;
+}
+
 export async function getMyVerification(landlordId: string): Promise<VerificationState> {
   if (isDemoMode) return demoStore.getVerification(landlordId);
   const { data, error } = await supabase!
@@ -162,6 +167,11 @@ export async function getMyVerification(landlordId: string): Promise<Verificatio
     rightToLetStatus: data?.right_to_let_status ?? "none",
     schemeDeclared: data?.deposit_scheme_declared ?? null,
     certificateStatus: data?.certificate_status ?? "none",
+    files: {
+      identity: fileLabel(data?.identity_file ?? null),
+      right_to_let: fileLabel(data?.right_to_let_file ?? null),
+      certificate: fileLabel(data?.certificate_file ?? null),
+    },
   };
 }
 
@@ -169,7 +179,7 @@ export async function submitVerificationDoc(
   landlordId: string,
   displayName: string,
   kind: "identity" | "right_to_let" | "certificate",
-  filePath: string,
+  file: { uri: string; name: string; mimeType: string },
 ): Promise<void> {
   if (isDemoMode) {
     const patch: Partial<VerificationState> =
@@ -181,12 +191,19 @@ export async function submitVerificationDoc(
     await demoStore.updateVerification(landlordId, patch, displayName);
     return;
   }
+  // Real upload to the private certificates bucket, then record the path.
+  const storagePath = await uploadToBucket(
+    "certificates",
+    `${landlordId}/${kind}-${Date.now()}-${file.name.replace(/[^\w.\-]/g, "_")}`,
+    file.uri,
+    file.mimeType,
+  );
   const column =
     kind === "identity"
-      ? { identity_status: "submitted", identity_file: filePath }
+      ? { identity_status: "submitted", identity_file: storagePath }
       : kind === "right_to_let"
-        ? { right_to_let_status: "submitted", right_to_let_file: filePath }
-        : { certificate_status: "submitted", certificate_file: filePath };
+        ? { right_to_let_status: "submitted", right_to_let_file: storagePath }
+        : { certificate_status: "submitted", certificate_file: storagePath };
   const { error } = await supabase!
     .from("landlord_verifications")
     .upsert({ landlord_id: landlordId, ...column });
@@ -195,6 +212,24 @@ export async function submitVerificationDoc(
     .from("review_queue")
     .insert({ type: kind, subject_id: landlordId });
   if (queueError) throw queueError;
+}
+
+/** Admin: storage paths of a landlord's verification documents. */
+export async function getVerificationDocPaths(
+  landlordId: string,
+): Promise<Partial<Record<"identity" | "right_to_let" | "certificate", string>>> {
+  if (isDemoMode) return {};
+  const { data, error } = await supabase!
+    .from("landlord_verifications")
+    .select("identity_file, right_to_let_file, certificate_file")
+    .eq("landlord_id", landlordId)
+    .maybeSingle();
+  if (error) throw error;
+  return {
+    identity: data?.identity_file ?? undefined,
+    right_to_let: data?.right_to_let_file ?? undefined,
+    certificate: data?.certificate_file ?? undefined,
+  };
 }
 
 export async function declareScheme(landlordId: string, scheme: DepositScheme): Promise<void> {
@@ -210,19 +245,20 @@ export async function declareScheme(landlordId: string, scheme: DepositScheme): 
 
 export type NewListingInput = Omit<Listing, "id" | "status" | "photosCheckedAt" | "photoUrls">;
 
-export async function createListing(input: NewListingInput, landlordLabel: string): Promise<void> {
+export async function createListing(input: NewListingInput, landlordLabel: string): Promise<string> {
   if (isDemoMode) {
+    const id = `demo-${Date.now()}`;
     await demoStore.addListing(
       {
         ...input,
-        id: `demo-${Date.now()}`,
+        id,
         status: "pending_review",
         photosCheckedAt: null,
         photoUrls: [],
       },
       `${input.title} — ${landlordLabel}`,
     );
-    return;
+    return id;
   }
   const { data, error } = await supabase!
     .from("listings")
@@ -249,6 +285,27 @@ export async function createListing(input: NewListingInput, landlordLabel: strin
     .from("review_queue")
     .insert({ type: "photos", subject_id: data.id });
   if (queueError) throw queueError;
+  return data.id;
+}
+
+/** Upload listing photos (picked local uris) and attach them to the listing. */
+export async function uploadListingPhotos(listingId: string, uris: string[]): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.setListingPhotos(listingId, uris);
+    return;
+  }
+  for (let i = 0; i < uris.length; i++) {
+    const path = await uploadToBucket(
+      "listing-photos",
+      `${listingId}/${Date.now()}-${i}.jpg`,
+      uris[i],
+      "image/jpeg",
+    );
+    const { error } = await supabase!
+      .from("listing_photos")
+      .insert({ listing_id: listingId, path, sort_order: i });
+    if (error) throw error;
+  }
 }
 
 export async function getMyListings(landlordId: string): Promise<Listing[]> {
@@ -497,6 +554,18 @@ export async function getContractDraft(subjectId: string): Promise<ContractExtra
     .maybeSingle();
   if (error) throw error;
   return data ? mapExtract(data.extracted) : null;
+}
+
+/** Admin: storage path of the uploaded contract PDF for a summary under review. */
+export async function getContractFilePath(summaryId: string): Promise<string | null> {
+  if (isDemoMode) return null;
+  const { data, error } = await supabase!
+    .from("contract_summaries")
+    .select("contract_file")
+    .eq("id", summaryId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.contract_file ?? null;
 }
 
 export async function saveContractDraft(subjectId: string, extracted: ContractExtract): Promise<void> {

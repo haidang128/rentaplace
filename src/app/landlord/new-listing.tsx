@@ -1,11 +1,13 @@
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ChipSelect, LabeledInput, PrimaryButton, ToggleRow } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { createListing } from "@/lib/data";
+import { createListing, uploadListingPhotos } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import type { RoomType } from "@/lib/types";
 
@@ -29,6 +31,8 @@ export default function NewListingScreen() {
   const [liveIn, setLiveIn] = useState(false);
   const [availableFrom, setAvailableFrom] = useState("");
   const [description, setDescription] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   if (!session || session.role !== "landlord") return <Redirect href="/(tabs)/profile" />;
@@ -131,29 +135,76 @@ export default function NewListingScreen() {
         style={{ minHeight: 100, textAlignVertical: "top" }}
       />
 
+      {/* Photos */}
+      <View style={{ gap: 8 }}>
+        <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkSoft }}>
+          {t("listingForm.photosLabel")}
+        </Text>
+        {photos.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {photos.map((uri) => (
+              <Pressable key={uri} onPress={() => setPhotos((prev) => prev.filter((p) => p !== uri))}>
+                <Image
+                  source={{ uri }}
+                  style={{ width: 84, height: 84, borderRadius: 10 }}
+                  contentFit="cover"
+                />
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : null}
+        <PrimaryButton
+          label={
+            photos.length > 0
+              ? `${t("listingForm.addPhotos")} · ${t("listingForm.photosCount", { count: photos.length })}`
+              : t("listingForm.addPhotos")
+          }
+          tone="gold"
+          onPress={async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ["images"],
+              allowsMultipleSelection: true,
+              selectionLimit: 8,
+              quality: 0.7,
+            });
+            if (!result.canceled) {
+              setPhotos((prev) => [...prev, ...result.assets.map((a) => a.uri)].slice(0, 8));
+            }
+          }}
+        />
+      </View>
+
       <PrimaryButton
-        label={t("listingForm.submit")}
-        disabled={!valid}
+        label={submitting ? t("onboarding.uploading") : t("listingForm.submit")}
+        disabled={!valid || submitting}
         onPress={async () => {
-          await createListing(
-            {
-              landlordId: session.userId,
-              title: title.trim(),
-              city: city.trim(),
-              area: area.trim(),
-              roomType,
-              pricePcm: priceNum,
-              depositAmount: depositNum,
-              billsIncluded: bills,
-              vietnameseFlatmates: parseInt(flatmates, 10) || 0,
-              nearUniversity: null,
-              liveInLandlord: liveIn,
-              availableFrom: availableFrom.trim() || null,
-              description: description.trim(),
-            },
-            session.displayName,
-          );
-          setSubmitted(true);
+          setSubmitting(true);
+          try {
+            const listingId = await createListing(
+              {
+                landlordId: session.userId,
+                title: title.trim(),
+                city: city.trim(),
+                area: area.trim(),
+                roomType,
+                pricePcm: priceNum,
+                depositAmount: depositNum,
+                billsIncluded: bills,
+                vietnameseFlatmates: parseInt(flatmates, 10) || 0,
+                nearUniversity: null,
+                liveInLandlord: liveIn,
+                availableFrom: availableFrom.trim() || null,
+                description: description.trim(),
+              },
+              session.displayName,
+            );
+            if (photos.length > 0) await uploadListingPhotos(listingId, photos);
+            setSubmitted(true);
+          } catch (e: any) {
+            Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+          } finally {
+            setSubmitting(false);
+          }
         }}
       />
       <View style={{ height: 24 }} />

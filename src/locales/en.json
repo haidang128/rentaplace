@@ -214,6 +214,7 @@
     "noPayment": "Free · No payments through the app",
     "viewProfile": "View profile →",
     "realPhotos": "Real photos · checked {{date}}",
+    "mapLink": "View location on the map →",
     "flatmatesVietnamese": "{{count}} Vietnamese flatmates"
   },
   "browse": {
@@ -295,6 +296,10 @@
     "certificateTitle": "Certificate from a past tenancy",
     "certificateBody": "Upload a deposit protection certificate from a past or current tenancy. Redact the tenant's name before uploading — we only need to see the scheme name, date and address.",
     "upload": "Upload file",
+    "uploading": "Uploading…",
+    "uploadedFile": "Uploaded: {{name}}",
+    "uploadSuccess": "Upload successful! The RentAPlace team will review within 48 hours.",
+    "uploadError": "Upload failed — please try again. ({{message}})",
     "statusNone": "Not submitted",
     "statusSubmitted": "Awaiting review",
     "statusApproved": "Approved ✓",
@@ -321,6 +326,9 @@
     "liveInHint": "Your tenant will be a lodger — different deposit rules. We'll show the lodger guide on your listing so everything is transparent.",
     "fieldAvailableFrom": "Available from (YYYY-MM-DD)",
     "fieldDescription": "Description",
+    "photosLabel": "Room photos",
+    "addPhotos": "Pick photos",
+    "photosCount": "{{count}} photos selected",
     "submit": "Submit for review",
     "submittedTitle": "Submitted!",
     "submittedBody": "The RentAPlace team will arrange real photos and review your listing within 48 hours."
@@ -336,6 +344,8 @@
     "typePhotos": "Photos + listing",
     "typeContract": "Contract summary",
     "resolved": "Resolved",
+    "viewDocument": "View document ({{kind}}) →",
+    "noDocument": "No document yet",
     "contractFormTitle": "Fill in the contract summary",
     "contractFormHint": "Read the contract PDF and fill this in — renters see exactly what you enter.",
     "fieldRent": "Rent £/month",

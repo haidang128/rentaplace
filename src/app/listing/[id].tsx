@@ -1,6 +1,7 @@
+import { Image } from "expo-image";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 
 import { PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
@@ -16,6 +17,7 @@ export default function ListingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, lang } = useLang();
   const { session } = useAuth();
+  const { width: screenWidth } = useWindowDimensions();
   const [listing, setListing] = useState<Listing | null>(null);
   const [landlord, setLandlord] = useState<Landlord | null>(null);
   const [hasContractSummary, setHasContractSummary] = useState(false);
@@ -44,7 +46,15 @@ export default function ListingDetailScreen() {
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 16 }}>
         {/* photos */}
         <View style={{ height: 236, backgroundColor: palette.paperDeep, alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ fontSize: 10, color: palette.inkFaint }}>{t("landing.hero.cardPhotoPlaceholder")}</Text>
+          {listing.photoUrls.length > 0 ? (
+            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
+              {listing.photoUrls.map((uri) => (
+                <Image key={uri} source={{ uri }} style={{ width: screenWidth, height: 236 }} contentFit="cover" transition={150} />
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={{ fontSize: 10, color: palette.inkFaint }}>{t("landing.hero.cardPhotoPlaceholder")}</Text>
+          )}
           {listing.photosCheckedAt ? (
             <View
               style={{
@@ -90,6 +100,21 @@ export default function ListingDetailScreen() {
             {listing.title} · {listing.area}, {listing.city}
             {listing.billsIncluded ? ` · ${t("listing.billsIncluded")}` : ""}
           </Text>
+
+          {/* Approximate location on the map (area-level; exact address only after contact) */}
+          <Pressable
+            onPress={() =>
+              Linking.openURL(
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${listing.area}, ${listing.city}, UK`,
+                )}`,
+              )
+            }
+          >
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.brick }}>
+              📍 {t("listing.mapLink")}
+            </Text>
+          </Pressable>
 
           {/* Verification checklist — the seal card */}
           <View

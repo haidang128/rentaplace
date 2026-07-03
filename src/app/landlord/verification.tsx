@@ -1,7 +1,7 @@
 import * as DocumentPicker from "expo-document-picker";
 import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 import { ChipSelect, PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
@@ -18,6 +18,7 @@ export default function VerificationScreen() {
   const { t } = useLang();
   const { session } = useAuth();
   const [state, setState] = useState<VerificationState | null>(null);
+  const [uploadingKind, setUploadingKind] = useState<DocKind | null>(null);
 
   const refresh = useCallback(() => {
     if (session) getMyVerification(session.userId).then(setState);
@@ -32,8 +33,21 @@ export default function VerificationScreen() {
       type: ["image/*", "application/pdf"],
     });
     if (result.canceled || !result.assets[0]) return;
-    await submitVerificationDoc(session.userId, session.displayName, kind, result.assets[0].name);
-    refresh();
+    const asset = result.assets[0];
+    setUploadingKind(kind);
+    try {
+      await submitVerificationDoc(session.userId, session.displayName, kind, {
+        uri: asset.uri,
+        name: asset.name,
+        mimeType: asset.mimeType ?? "application/octet-stream",
+      });
+      Alert.alert("✓", t("onboarding.uploadSuccess"));
+      refresh();
+    } catch (e: any) {
+      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+    } finally {
+      setUploadingKind(null);
+    }
   };
 
   const statusLabel = (s: string) =>
@@ -73,16 +87,28 @@ export default function VerificationScreen() {
         body={t("onboarding.identityBody")}
         status={statusLabel(state.identityStatus)}
         statusColor={statusColor(state.identityStatus)}
-        actionLabel={t("onboarding.upload")}
-        onAction={state.identityStatus === "approved" ? undefined : () => pickAndSubmit("identity")}
+        fileName={state.files?.identity}
+        uploadedLabel={state.files?.identity ? t("onboarding.uploadedFile", { name: state.files.identity }) : undefined}
+        actionLabel={uploadingKind === "identity" ? t("onboarding.uploading") : t("onboarding.upload")}
+        onAction={
+          state.identityStatus === "approved" || uploadingKind !== null
+            ? undefined
+            : () => pickAndSubmit("identity")
+        }
       />
       <DocCard
         title={t("onboarding.rightToLetTitle")}
         body={t("onboarding.rightToLetBody")}
         status={statusLabel(state.rightToLetStatus)}
         statusColor={statusColor(state.rightToLetStatus)}
-        actionLabel={t("onboarding.upload")}
-        onAction={state.rightToLetStatus === "approved" ? undefined : () => pickAndSubmit("right_to_let")}
+        fileName={state.files?.right_to_let}
+        uploadedLabel={state.files?.right_to_let ? t("onboarding.uploadedFile", { name: state.files.right_to_let }) : undefined}
+        actionLabel={uploadingKind === "right_to_let" ? t("onboarding.uploading") : t("onboarding.upload")}
+        onAction={
+          state.rightToLetStatus === "approved" || uploadingKind !== null
+            ? undefined
+            : () => pickAndSubmit("right_to_let")
+        }
       />
 
       {/* Deposit pledge: declare scheme (tier 1), then certificate (tier 2) */}
@@ -108,8 +134,14 @@ export default function VerificationScreen() {
         body={t("onboarding.certificateBody")}
         status={statusLabel(state.certificateStatus)}
         statusColor={statusColor(state.certificateStatus)}
-        actionLabel={t("onboarding.upload")}
-        onAction={state.certificateStatus === "approved" ? undefined : () => pickAndSubmit("certificate")}
+        fileName={state.files?.certificate}
+        uploadedLabel={state.files?.certificate ? t("onboarding.uploadedFile", { name: state.files.certificate }) : undefined}
+        actionLabel={uploadingKind === "certificate" ? t("onboarding.uploading") : t("onboarding.upload")}
+        onAction={
+          state.certificateStatus === "approved" || uploadingKind !== null
+            ? undefined
+            : () => pickAndSubmit("certificate")
+        }
       />
     </ScrollView>
   );
@@ -134,6 +166,8 @@ function DocCard({
   statusColor,
   actionLabel,
   onAction,
+  fileName,
+  uploadedLabel,
 }: {
   title: string;
   body: string;
@@ -141,6 +175,8 @@ function DocCard({
   statusColor: string;
   actionLabel: string;
   onAction?: () => void;
+  fileName?: string;
+  uploadedLabel?: string;
 }) {
   return (
     <View style={cardStyle}>
@@ -149,6 +185,14 @@ function DocCard({
         <Text style={{ fontFamily: fonts.sansBold, fontSize: 12.5, color: statusColor }}>{status}</Text>
       </View>
       <Text style={bodyStyle}>{body}</Text>
+      {fileName && uploadedLabel ? (
+        <Text
+          numberOfLines={1}
+          style={{ fontFamily: fonts.sansSemiBold, fontSize: 12.5, color: palette.green }}
+        >
+          📎 {uploadedLabel}
+        </Text>
+      ) : null}
       {onAction ? <PrimaryButton label={actionLabel} onPress={onAction} /> : null}
     </View>
   );

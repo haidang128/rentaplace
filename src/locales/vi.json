@@ -214,6 +214,7 @@
     "noPayment": "Miễn phí · Không thanh toán qua ứng dụng",
     "viewProfile": "Xem hồ sơ →",
     "realPhotos": "Ảnh thật · kiểm tra {{date}}",
+    "mapLink": "Xem vị trí trên bản đồ →",
     "flatmatesVietnamese": "{{count}} người Việt đang ở"
   },
   "browse": {
@@ -295,6 +296,10 @@
     "certificateTitle": "Chứng chỉ từ hợp đồng trước",
     "certificateBody": "Tải lên chứng chỉ bảo vệ cọc của một hợp đồng cũ hoặc hiện tại. Che tên người thuê trước khi tải lên — chúng tôi chỉ cần thấy tên chương trình, ngày và địa chỉ.",
     "upload": "Tải tệp lên",
+    "uploading": "Đang tải lên…",
+    "uploadedFile": "Đã tải lên: {{name}}",
+    "uploadSuccess": "Tải lên thành công! Đội RentAPlace sẽ duyệt trong 48 giờ.",
+    "uploadError": "Tải lên thất bại — thử lại nhé. ({{message}})",
     "statusNone": "Chưa nộp",
     "statusSubmitted": "Đang chờ duyệt",
     "statusApproved": "Đã duyệt ✓",
@@ -321,6 +326,9 @@
     "liveInHint": "Người thuê sẽ là lodger — quy định tiền cọc khác. Chúng tôi sẽ hiển thị hướng dẫn lodger trên tin của bạn để mọi thứ minh bạch.",
     "fieldAvailableFrom": "Còn trống từ (YYYY-MM-DD)",
     "fieldDescription": "Mô tả",
+    "photosLabel": "Ảnh phòng",
+    "addPhotos": "Chọn ảnh từ máy",
+    "photosCount": "{{count}} ảnh đã chọn",
     "submit": "Gửi để kiểm duyệt",
     "submittedTitle": "Đã gửi!",
     "submittedBody": "Đội RentAPlace sẽ hẹn chụp ảnh thật và duyệt tin trong 48 giờ."
@@ -336,6 +344,8 @@
     "typePhotos": "Ảnh + tin đăng",
     "typeContract": "Tóm tắt hợp đồng",
     "resolved": "Đã xử lý",
+    "viewDocument": "Xem tài liệu ({{kind}}) →",
+    "noDocument": "Chưa có tài liệu",
     "contractFormTitle": "Điền tóm tắt hợp đồng",
     "contractFormHint": "Đọc hợp đồng PDF rồi điền — người thuê sẽ thấy đúng những gì bạn nhập.",
     "fieldRent": "Tiền thuê £/tháng",
