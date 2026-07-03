@@ -52,6 +52,7 @@ export default function ProfileScreen() {
           {session.role === "landlord" ? (
             <>
               <MenuLink href="/landlord/verification" label={t("onboarding.title")} />
+              <MenuLink href="/landlord/listings" label={t("onboarding.myListings")} />
               <MenuLink href="/landlord/new-listing" label={t("listingForm.title")} />
             </>
           ) : null}

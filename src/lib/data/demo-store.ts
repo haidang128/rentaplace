@@ -50,6 +50,24 @@ export type Tenancy = {
   reviewed: boolean;
 };
 
+export type ContractExtract = {
+  rentPcm: number | null;
+  rentDueDay: number | null;
+  billsIncluded: boolean | null;
+  depositAmount: number | null;
+  scheme: DepositScheme | null;
+  noticeMonths: number | null;
+  termType: "periodic" | "fixed" | null;
+  isLodgerAgreement: boolean | null;
+  unusualClauses: string[];
+};
+
+export type ContractSummary = {
+  listingId: string;
+  status: "ai_draft" | "approved" | "rejected";
+  extracted: ContractExtract;
+};
+
 export type QueueItem = {
   id: string;
   type: "identity" | "right_to_let" | "certificate" | "photos" | "contract_summary";
@@ -68,6 +86,7 @@ type DemoState = {
   messages: ChatMessage[];
   tenancies: Tenancy[];
   extraReviews: { landlordId: string; stars: number; body: string; depositReturnedInFull: boolean }[];
+  contractSummaries: ContractSummary[];
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -93,6 +112,24 @@ function initialState(): DemoState {
     savedIds: [],
     tenancies: [],
     extraReviews: [],
+    contractSummaries: [
+      // Seeded approved summary for the Fallowfield listing (design screen 1f)
+      {
+        listingId: "10000000-0000-4000-8000-000000000001",
+        status: "approved",
+        extracted: {
+          rentPcm: 520,
+          rentDueDay: 1,
+          billsIncluded: true,
+          depositAmount: 600,
+          scheme: "dps",
+          noticeMonths: 2,
+          termType: "periodic",
+          isLodgerAgreement: false,
+          unusualClauses: [],
+        },
+      },
+    ],
     conversations: [
       {
         id: "c-seed-1",
@@ -295,6 +332,31 @@ export const demoStore = {
     await save();
   },
 
+  async getContractSummary(listingId: string): Promise<ContractSummary | null> {
+    const s = await load();
+    return s.contractSummaries.find((c) => c.listingId === listingId) ?? null;
+  },
+
+  async submitContract(listingId: string, listingLabel: string, extracted: ContractExtract) {
+    const s = await load();
+    const existing = s.contractSummaries.find((c) => c.listingId === listingId);
+    if (existing) {
+      existing.extracted = extracted;
+      existing.status = "ai_draft";
+    } else {
+      s.contractSummaries.push({ listingId, status: "ai_draft", extracted });
+    }
+    s.queue.push({
+      id: `q-${Date.now()}`,
+      type: "contract_summary",
+      subjectId: listingId,
+      subjectLabel: listingLabel,
+      status: "open",
+      createdAt: new Date().toISOString(),
+    });
+    await save();
+  },
+
   /** Flywheel overlay for demo landlords: confirmations + extra reviews. */
   async getLandlordOverlay(landlordId: string): Promise<{
     confirmations: number;
@@ -332,6 +394,10 @@ export const demoStore = {
     if (item.type === "photos") {
       const listing = s.createdListings.find((l) => l.id === item.subjectId);
       if (listing) listing.status = resolution === "approved" ? "live" : "draft";
+    }
+    if (item.type === "contract_summary") {
+      const summary = s.contractSummaries.find((c) => c.listingId === item.subjectId);
+      if (summary) summary.status = resolution;
     }
     await save();
   },

@@ -2,6 +2,8 @@ import { demoLandlords, demoListings, demoReviews } from "@/lib/data/demo-data";
 import {
   demoStore,
   type ChatMessage,
+  type ContractExtract,
+  type ContractSummary,
   type Conversation,
   type QueueItem,
   type Tenancy,
@@ -376,6 +378,71 @@ export async function endTenancyWithReview(
     deposit_returned_in_full: review.depositReturnedInFull,
   });
   if (error) throw error;
+}
+
+// ── M6: contract summaries ───────────────────────────────────────────────────
+
+function mapExtract(raw: any): ContractExtract {
+  return {
+    rentPcm: raw?.rent_pcm ?? raw?.rentPcm ?? null,
+    rentDueDay: raw?.rent_due_day ?? raw?.rentDueDay ?? null,
+    billsIncluded: raw?.bills_included ?? raw?.billsIncluded ?? null,
+    depositAmount: raw?.deposit_amount ?? raw?.depositAmount ?? null,
+    scheme: raw?.scheme_mentioned ?? raw?.scheme ?? null,
+    noticeMonths: raw?.notice_months ?? raw?.noticeMonths ?? null,
+    termType: raw?.term_type ?? raw?.termType ?? null,
+    isLodgerAgreement: raw?.is_lodger_agreement ?? raw?.isLodgerAgreement ?? null,
+    unusualClauses: raw?.unusual_clauses ?? raw?.unusualClauses ?? [],
+  };
+}
+
+/** Approved-only for renters; landlord/admin see drafts via their own surfaces. */
+export async function getApprovedContractSummary(listingId: string): Promise<ContractSummary | null> {
+  if (isDemoMode) {
+    const summary = await demoStore.getContractSummary(listingId);
+    return summary?.status === "approved" ? summary : null;
+  }
+  const { data, error } = await supabase!
+    .from("contract_summaries")
+    .select("listing_id, status, extracted")
+    .eq("listing_id", listingId)
+    .eq("status", "approved")
+    .maybeSingle();
+  if (error) throw error;
+  return data
+    ? { listingId: data.listing_id, status: data.status, extracted: mapExtract(data.extracted) }
+    : null;
+}
+
+export async function submitContract(
+  listing: Listing,
+  contractFilePath: string,
+): Promise<void> {
+  if (isDemoMode) {
+    // Demo: fabricate a plausible draft from the listing (real mode runs Claude in the Edge Function).
+    await demoStore.submitContract(listing.id, listing.title, {
+      rentPcm: listing.pricePcm,
+      rentDueDay: 1,
+      billsIncluded: listing.billsIncluded,
+      depositAmount: listing.depositAmount,
+      scheme: null,
+      noticeMonths: 2,
+      termType: "periodic",
+      isLodgerAgreement: listing.liveInLandlord,
+      unusualClauses: [],
+    });
+    return;
+  }
+  const { data, error } = await supabase!
+    .from("contract_summaries")
+    .upsert({ listing_id: listing.id, contract_file: contractFilePath, status: "ai_draft" })
+    .select("id")
+    .single();
+  if (error) throw error;
+  const { error: fnError } = await supabase!.functions.invoke("summarize-contract", {
+    body: { summary_id: data.id },
+  });
+  if (fnError) throw fnError;
 }
 
 // ── M4: chat ─────────────────────────────────────────────────────────────────

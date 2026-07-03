@@ -6,7 +6,7 @@ import { PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { getLandlord, getListing, getOrCreateConversation } from "@/lib/data";
+import { getApprovedContractSummary, getLandlord, getListing, getOrCreateConversation } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import type { Landlord, Listing } from "@/lib/types";
 
@@ -18,6 +18,7 @@ export default function ListingDetailScreen() {
   const { session } = useAuth();
   const [listing, setListing] = useState<Listing | null>(null);
   const [landlord, setLandlord] = useState<Landlord | null>(null);
+  const [hasContractSummary, setHasContractSummary] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -25,6 +26,7 @@ export default function ListingDetailScreen() {
       setListing(l);
       if (l) setLandlord(await getLandlord(l.landlordId));
     });
+    getApprovedContractSummary(id).then((s) => setHasContractSummary(!!s));
   }, [id]);
 
   if (!listing) return null;
@@ -138,6 +140,14 @@ export default function ListingDetailScreen() {
                 }
                 tone={landlord?.certificateReviewed ? "check" : "pending"}
               />
+            ) : null}
+
+            {hasContractSummary ? (
+              <Link href={`/contract/${listing.id}` as any} asChild>
+                <Pressable>
+                  <CheckRow label={t("trust.checkContract")} />
+                </Pressable>
+              </Link>
             ) : null}
 
             {/* Education row — read before you pay */}
