@@ -280,7 +280,9 @@
     "demoRenter": "Renter (Mai)",
     "demoLandlord": "Verified landlord (Chú Hùng)",
     "demoLandlordNew": "New landlord (Cô Lan)",
-    "demoAdmin": "RentAPlace admin"
+    "demoAdmin": "RentAPlace admin",
+    "becomeLandlord": "I'm a landlord — I want to list a room",
+    "becomeLandlordHint": "Switch your account to landlord to create listings and get verified. Free."
   },
   "onboarding": {
     "title": "Landlord verification",

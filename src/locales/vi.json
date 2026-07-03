@@ -280,7 +280,9 @@
     "demoRenter": "Người thuê (Mai)",
     "demoLandlord": "Chủ nhà đã xác minh (Chú Hùng)",
     "demoLandlordNew": "Chủ nhà mới (Cô Lan)",
-    "demoAdmin": "Quản trị RentAPlace"
+    "demoAdmin": "Quản trị RentAPlace",
+    "becomeLandlord": "Tôi là chủ nhà — tôi muốn đăng tin",
+    "becomeLandlordHint": "Chuyển tài khoản sang chủ nhà để đăng tin và xác minh hồ sơ. Miễn phí."
   },
   "onboarding": {
     "title": "Xác minh chủ nhà",

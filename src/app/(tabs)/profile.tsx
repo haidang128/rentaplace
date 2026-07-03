@@ -59,6 +59,7 @@ export default function ProfileScreen() {
           {session.role === "admin" ? <MenuLink href="/admin" label={t("admin.title")} /> : null}
           {session.role === "renter" ? <MenuLink href="/tenancy" label={t("tenancy.menuLink")} /> : null}
           <MenuLink href="/handbook" label={t("handbook.title")} />
+          {session.role === "renter" && !isDemoMode ? <BecomeLandlord /> : null}
 
           <Pressable onPress={signOut} style={{ paddingVertical: 10 }}>
             <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.brick }}>
@@ -108,6 +109,41 @@ function MenuLink({ href, label }: { href: string; label: string }) {
         <Text style={{ fontFamily: fonts.sansBold, fontSize: 15, color: palette.brick }}>{label} →</Text>
       </Pressable>
     </Link>
+  );
+}
+
+function BecomeLandlord() {
+  const { t } = useLang();
+  const { becomeLandlord } = useAuth();
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <View
+      style={{
+        backgroundColor: palette.goldWash,
+        borderRadius: radius.tile,
+        borderCurve: "continuous",
+        padding: 16,
+        gap: 10,
+      }}
+    >
+      <Text style={{ fontFamily: fonts.sans, fontSize: 13, lineHeight: 20, color: palette.goldInk }}>
+        {t("auth.becomeLandlordHint")}
+      </Text>
+      <PrimaryButton
+        label={t("auth.becomeLandlord")}
+        tone="gold"
+        disabled={busy}
+        onPress={async () => {
+          setBusy(true);
+          try {
+            await becomeLandlord();
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+    </View>
   );
 }
 

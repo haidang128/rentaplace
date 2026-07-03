@@ -45,6 +45,8 @@ type AuthContextValue = {
   /** Real mode: email OTP via Supabase. */
   sendOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, code: string) => Promise<void>;
+  /** Real mode: renter -> landlord self-serve upgrade (server-enforced, never admin). */
+  becomeLandlord: () => Promise<void>;
   signOut: () => void;
 };
 
@@ -95,6 +97,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   }, []);
 
+  const becomeLandlord = useCallback(async () => {
+    if (isDemoMode) return;
+    const { error } = await supabase!.rpc("become_landlord");
+    if (error) throw error;
+    const { data } = await supabase!.auth.getSession();
+    if (data.session) setSession(await loadProfile(data.session.user.id));
+  }, []);
+
   const signOut = useCallback(() => {
     setSession(null);
     if (isDemoMode) {
@@ -105,8 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ session, ready, signInDemo, sendOtp, verifyOtp, signOut }),
-    [session, ready, signInDemo, sendOtp, verifyOtp, signOut],
+    () => ({ session, ready, signInDemo, sendOtp, verifyOtp, becomeLandlord, signOut }),
+    [session, ready, signInDemo, sendOtp, verifyOtp, becomeLandlord, signOut],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;
