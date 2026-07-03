@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EFE9DE;font-family:'Be Vietnam Pro',system-ui,sans-serif}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 'Be Vietnam Pro',system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 'Be Vietnam Pro',system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#B23A2E;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 'Be Vietnam Pro',system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.vi{display:none}
+body[data-lang="vi"] .vi{display:revert}
+body[data-lang="vi"] .en{display:none}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">RentAPlace — landing (desktop + mobile) và 4 màn hình app · one polished direction</span></div>
+
+<div style="max-width:1280px;background:#FFFDF8;border:1px solid #E9DCC6;border-radius:10px;padding:18px 22px;margin:0 0 24px;display:flex;gap:28px;flex-wrap:wrap;font-size:12px;line-height:1.55;color:#6E5D4F">
+  <div style="flex:1;min-width:260px"><strong style="color:#2C201A">Hệ thống / System.</strong> Nền giấy ấm + thẻ trắng; đỏ gạch <span style="color:#B23A2E;font-weight:700">#B23A2E</span> + vàng ấn <span style="color:#C08A2D;font-weight:700">#E8B54A</span> (bản sắc Việt, không rồng-đèn lồng); xanh lá chỉ dùng cho "tiền cọc được bảo vệ". Chữ: Be Vietnam Pro (thiết kế cho tiếng Việt) + Lora cho tiêu đề.</div>
+  <div style="flex:1;min-width:260px"><strong style="color:#2C201A">Con dấu / The seal.</strong> Dấu kiểm chứng 8 cánh — như con dấu công chứng — là nhận diện thương hiệu, lặp lại ở mọi điểm chạm. Nút <strong>VI ⇄ EN</strong> trên thanh nav của landing hoạt động thật. Ảnh là ô chờ (chèn ảnh thật sau — không dùng ảnh stock).</div>
+</div>
+
+<div class="dv-opts">
+
+<!-- ═══════════════ 1a DESKTOP LANDING ═══════════════ -->
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Landing — desktop 1280 · VI ⇄ EN toggle hoạt động</div>
+<div class="dv-card" style="width:1280px;background:#FBF6EE">
+
+  <!-- nav -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 48px;border-bottom:1px solid #F0E5D2;background:#FBF6EE">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-weight:800;font-size:20px;color:#2C201A;letter-spacing:-0.2px">RentAPlace</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:28px;font-size:14px;font-weight:600;color:#6E5D4F">
+      <span><span class="vi">Cách hoạt động</span><span class="en">How it works</span></span>
+      <span><span class="vi">Vì sao an toàn</span><span class="en">Why it's safe</span></span>
+      <span><span class="vi">Cho chủ nhà</span><span class="en">For landlords</span></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button onClick="{{ toggleLang }}" style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;border:1.5px solid #E2D4BC;background:#FFFDF8;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;color:#2C201A;cursor:pointer" style-hover="border-color:#B23A2E;color:#B23A2E">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"></path></svg>
+        <span class="vi">English</span><span class="en">Tiếng Việt</span>
+      </button>
+      <button style="padding:10px 18px;border-radius:999px;border:none;background:#B23A2E;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#8E2B21"><span class="vi">Tìm phòng</span><span class="en">Find a room</span></button>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div style="display:grid;grid-template-columns:1.08fr 0.92fr;gap:56px;padding:64px 48px 72px;align-items:center">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+        <svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#C08A2D"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C08A2D"><span class="vi">Dành cho người Việt tại Vương quốc Anh</span><span class="en">For the Vietnamese community in the UK</span></span>
+      </div>
+      <h1 style="margin:0 0 14px;font-family:Lora,serif;font-weight:600;font-size:52px;line-height:1.14;color:#2C201A;letter-spacing:-0.5px;text-wrap:pretty"><span class="vi">Phòng đã kiểm chứng.<br>Không lừa đảo.<br><em style="color:#B23A2E">Bằng tiếng Việt.</em></span><span class="en">Verified rooms.<br>No scams.<br><em style="color:#B23A2E">In Vietnamese.</em></span></h1>
+      <p style="margin:0 0 12px;font-size:19px;font-weight:500;color:#A08B76"><span class="vi">Verified rooms. No scams. In Vietnamese.</span><span class="en">Phòng đã kiểm chứng. Không lừa đảo. Bằng tiếng Việt.</span></p>
+      <p style="margin:0 0 28px;font-size:16.5px;line-height:1.65;color:#6E5D4F;max-width:520px;text-wrap:pretty"><span class="vi">Chúng tôi kiểm tra chủ nhà, ảnh và tiền cọc <strong style="color:#2C201A">trước khi</strong> bạn thấy tin đăng — để bạn không bao giờ mất tiền oan vì một bài đăng ẩn danh trên Facebook.</span><span class="en">We check the landlord, the photos and the deposit <strong style="color:#2C201A">before</strong> you ever see a listing — so you never lose money to an anonymous Facebook post.</span></p>
+      <div style="display:flex;gap:10px;max-width:540px">
+        <input class="vi" placeholder="Email của bạn" style="flex:1;min-width:0;padding:16px 18px;border-radius:14px;border:1.5px solid #E2D4BC;background:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;color:#2C201A;outline:none">
+        <input class="en" placeholder="Your email" style="flex:1;min-width:0;padding:16px 18px;border-radius:14px;border:1.5px solid #E2D4BC;background:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;color:#2C201A;outline:none">
+        <button style="padding:16px 26px;border-radius:14px;border:none;background:#B23A2E;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(178,58,46,0.28)" style-hover="background:#8E2B21"><span class="vi">Tìm phòng an toàn</span><span class="en">Find a safe room</span></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:14px;font-size:14px">
+        <span style="color:#B23A2E;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer"><span class="vi">hoặc để lại số Zalo →</span><span class="en">or leave your Zalo number →</span></span>
+        <span style="color:#A08B76"><span class="vi">Miễn phí · Không chia sẻ thông tin của bạn</span><span class="en">Free · We never share your details</span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:36px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A08B76"><span class="vi">Tiền cọc được bảo vệ theo quy định UK</span><span class="en">Deposits protected under UK schemes</span></span>
+        <div style="display:flex;gap:8px">
+          <span style="padding:5px 12px;border-radius:7px;border:1.5px solid #E2D4BC;font-size:11.5px;font-weight:800;letter-spacing:0.8px;color:#8A7860">DPS</span>
+          <span style="padding:5px 12px;border-radius:7px;border:1.5px solid #E2D4BC;font-size:11.5px;font-weight:800;letter-spacing:0.8px;color:#8A7860">mydeposits</span>
+          <span style="padding:5px 12px;border-radius:7px;border:1.5px solid #E2D4BC;font-size:11.5px;font-weight:800;letter-spacing:0.8px;color:#8A7860">TDS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- hero listing card -->
+    <div style="position:relative;justify-self:center">
+      <div style="width:430px;background:#fff;border:1px solid #EFE3CF;border-radius:22px;box-shadow:0 24px 60px rgba(60,40,20,0.14);overflow:hidden;transform:rotate(0.6deg)">
+        <div style="position:relative">
+          <div style="height:250px;background:repeating-linear-gradient(45deg,#EFE3CF 0 12px,#E9DCC4 12px 24px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A7860"><span class="vi">[ ảnh thật của phòng — đội RentAPlace chụp ]</span><span class="en">[ real room photo — shot by our team ]</span></div>
+          <div style="position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:7px;background:#fff;border-radius:999px;padding:7px 13px 7px 9px;box-shadow:0 3px 10px rgba(0,0,0,0.14)">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:12.5px;font-weight:800;color:#2C201A"><span class="vi">Đã kiểm chứng</span><span class="en">Verified</span></span>
+          </div>
+        </div>
+        <div style="padding:20px 22px 22px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:22px;font-weight:800;color:#2C201A">£520<span style="font-size:14px;font-weight:600;color:#A08B76">/<span class="vi">tháng</span><span class="en">month</span></span></span>
+            <span style="padding:6px 12px;border-radius:999px;background:#F6EACB;color:#8A6215;font-size:12px;font-weight:700"><span class="vi">2 người Việt đang ở</span><span class="en">2 Vietnamese flatmates</span></span>
+          </div>
+          <div style="font-size:14.5px;color:#6E5D4F;margin-bottom:16px"><span class="vi">Phòng đôi · Fallowfield, Manchester</span><span class="en">Double room · Fallowfield, Manchester</span></div>
+          <div style="display:flex;align-items:center;gap:11px;border-top:1px solid #F0E5D2;padding-top:15px">
+            <div style="width:34px;height:34px;border-radius:999px;background:#F6EACB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#8A6215">H</div>
+            <div style="flex:1;font-size:13.5px;color:#2C201A;font-weight:600"><span class="vi">Chú Hùng — chủ nhà đã xác minh</span><span class="en">Mr Hùng — verified landlord</span></div>
+            <svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;left:-26px;bottom:-20px;display:flex;align-items:center;gap:8px;background:#2F7A55;color:#fff;border-radius:12px;padding:11px 16px;box-shadow:0 10px 26px rgba(47,122,85,0.35);transform:rotate(-1.5deg)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"></path></svg>
+        <span style="font-size:13px;font-weight:700"><span class="vi">Cọc £600 bảo vệ tại DPS</span><span class="en">£600 deposit protected at DPS</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 steps -->
+  <div style="background:#fff;border-top:1px solid #F0E5D2;border-bottom:1px solid #F0E5D2;padding:68px 48px">
+    <div style="text-align:center;margin-bottom:44px">
+      <h2 style="margin:0 0 8px;font-family:Lora,serif;font-weight:600;font-size:34px;color:#2C201A"><span class="vi">An toàn trong 3 bước</span><span class="en">Safe in three steps</span></h2>
+      <p style="margin:0;font-size:15.5px;color:#A08B76"><span class="vi">Mọi tin đăng đều qua ba lớp kiểm tra trước khi đến với bạn.</span><span class="en">Every listing passes three checks before it reaches you.</span></p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;max-width:1100px;margin:0 auto">
+      <div style="background:#FBF6EE;border:1px solid #F0E5D2;border-radius:20px;padding:30px 28px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+          <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:46px;color:#E8B54A;line-height:1">1</span>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B23A2E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><circle cx="8.5" cy="11" r="2"></circle><path d="M5.5 16.5c0.6-1.7 1.7-2.5 3-2.5s2.4 0.8 3 2.5M14 9.5h5M14 13h3.5"></path></svg>
+        </div>
+        <h3 style="margin:0 0 8px;font-size:19px;font-weight:700;color:#2C201A"><span class="vi">Chúng tôi kiểm tra chủ nhà</span><span class="en">We verify the landlord</span></h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.65;color:#6E5D4F"><span class="vi">Giấy tờ tuỳ thân và quyền cho thuê được xác minh trước khi tin được đăng.</span><span class="en">Identity documents and the right to let are verified before the listing goes live.</span></p>
+      </div>
+      <div style="background:#FBF6EE;border:1px solid #F0E5D2;border-radius:20px;padding:30px 28px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+          <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:46px;color:#E8B54A;line-height:1">2</span>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2F7A55" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7.5 3v5.5c0 5-3.2 8.7-7.5 10.5-4.3-1.8-7.5-5.5-7.5-10.5V5.5z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>
+        </div>
+        <h3 style="margin:0 0 8px;font-size:19px;font-weight:700;color:#2C201A"><span class="vi">Kiểm tra tiền cọc được bảo vệ</span><span class="en">We check the deposit is protected</span></h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.65;color:#6E5D4F"><span class="vi">Cọc phải nằm trong chương trình bảo vệ của chính phủ Anh — DPS, mydeposits hoặc TDS.</span><span class="en">The deposit must sit in a UK government scheme — DPS, mydeposits or TDS.</span></p>
+      </div>
+      <div style="background:#FBF6EE;border:1px solid #F0E5D2;border-radius:20px;padding:30px 28px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+          <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:46px;color:#E8B54A;line-height:1">3</span>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C08A2D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7.5 8 7.5"></path><path d="M6 9.5V20h12V9.5"></path><path d="M10 20v-6h4v6"></path></svg>
+        </div>
+        <h3 style="margin:0 0 8px;font-size:19px;font-weight:700;color:#2C201A"><span class="vi">Bạn chuyển vào an toàn</span><span class="en">You move in safely</span></h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.65;color:#6E5D4F"><span class="vi">Hợp đồng được tóm tắt bằng tiếng Việt dễ hiểu trước khi bạn ký.</span><span class="en">The contract is summarised in plain Vietnamese before you sign anything.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- facebook comparison -->
+  <div style="padding:68px 48px;background:#FBF6EE">
+    <div style="text-align:center;margin-bottom:44px">
+      <h2 style="margin:0 0 8px;font-family:Lora,serif;font-weight:600;font-size:34px;color:#2C201A"><span class="vi">Tại sao không dùng nhóm Facebook?</span><span class="en">Why not Facebook groups?</span></h2>
+      <p style="margin:0;font-size:15.5px;color:#A08B76"><span class="vi">Cùng một căn phòng — hai mức độ an toàn rất khác nhau.</span><span class="en">The same room — two very different levels of safety.</span></p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 56px 1fr;gap:0;max-width:1060px;margin:0 auto;align-items:center">
+      <!-- anonymous post -->
+      <div style="background:#F2EFE9;border:1.5px dashed #C9BFAE;border-radius:18px;padding:24px 26px;transform:rotate(-0.6deg)">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
+          <div style="width:38px;height:38px;border-radius:999px;background:#D8D2C6;display:flex;align-items:center;justify-content:center;color:#9A917F;font-weight:800;font-size:16px">?</div>
+          <div>
+            <div style="font-size:14.5px;font-weight:700;color:#5B5346"><span class="vi">Người dùng ẩn danh</span><span class="en">Anonymous user</span></div>
+            <div style="font-size:12px;color:#9A917F"><span class="vi">Nhóm Facebook · 2 giờ trước</span><span class="en">Facebook group · 2 hrs ago</span></div>
+          </div>
+        </div>
+        <div style="height:10px;border-radius:5px;background:#DDD6C8;margin-bottom:7px;width:92%"></div>
+        <div style="height:10px;border-radius:5px;background:#DDD6C8;margin-bottom:18px;width:64%"></div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#EAD5D0;color:#B23A2E;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✕</span><span style="font-size:14px;color:#5B5346"><span class="vi">Không biết ai đứng sau bài đăng</span><span class="en">No idea who is behind the post</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#EAD5D0;color:#B23A2E;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✕</span><span style="font-size:14px;color:#5B5346"><span class="vi">Cọc chuyển tay — mất là mất luôn</span><span class="en">Deposit changes hands — gone is gone</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#EAD5D0;color:#B23A2E;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✕</span><span style="font-size:14px;color:#5B5346"><span class="vi">Ảnh có thể lấy từ trên mạng</span><span class="en">Photos may be pulled off the internet</span></span></div>
+        </div>
+        <div style="margin-top:18px;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:#EAD5D0;color:#8E2B21;font-size:12.5px;font-weight:700"><span class="vi">⚠ Rủi ro lừa đảo cao</span><span class="en">⚠ High scam risk</span></div>
+      </div>
+      <!-- vs -->
+      <div style="display:flex;justify-content:center"><span style="width:44px;height:44px;border-radius:999px;background:#2C201A;color:#F6EACB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:0.5px;z-index:2;box-shadow:0 4px 14px rgba(0,0,0,0.2)">VS</span></div>
+      <!-- verified listing -->
+      <div style="background:#fff;border:1.5px solid #E8B54A;border-radius:18px;padding:24px 26px;box-shadow:0 18px 44px rgba(178,58,46,0.10)">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
+          <svg width="38" height="38" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <div>
+            <div style="font-size:14.5px;font-weight:700;color:#2C201A"><span class="vi">Tin đã kiểm chứng</span><span class="en">Verified listing</span></div>
+            <div style="font-size:12px;color:#A08B76"><span class="vi">RentAPlace · kiểm tra ngày 12/06</span><span class="en">RentAPlace · checked 12 June</span></div>
+          </div>
+        </div>
+        <div style="height:10px;border-radius:5px;background:#F6EACB;margin-bottom:7px;width:92%"></div>
+        <div style="height:10px;border-radius:5px;background:#F6EACB;margin-bottom:18px;width:64%"></div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✓</span><span style="font-size:14px;color:#2C201A;font-weight:500"><span class="vi">Chủ nhà đã xác minh danh tính</span><span class="en">Landlord identity verified</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✓</span><span style="font-size:14px;color:#2C201A;font-weight:500"><span class="vi">Cọc trong chương trình bảo vệ của chính phủ</span><span class="en">Deposit in a government scheme</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✓</span><span style="font-size:14px;color:#2C201A;font-weight:500"><span class="vi">Ảnh thật — đội RentAPlace chụp tại chỗ</span><span class="en">Real photos — taken on site by our team</span></span></div>
+        </div>
+        <div style="margin-top:18px;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:#E4F0E7;color:#2F7A55;font-size:12.5px;font-weight:700"><span class="vi">✓ An toàn để chuyển vào</span><span class="en">✓ Safe to move in</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- landlord band -->
+  <div style="background:#33241C;padding:68px 48px">
+    <div style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:56px;max-width:1100px;margin:0 auto;align-items:center">
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#E8B54A;margin-bottom:14px"><span class="vi">Dành cho chủ nhà</span><span class="en">For landlords</span></div>
+        <h2 style="margin:0 0 10px;font-family:Lora,serif;font-weight:600;font-size:36px;line-height:1.2;color:#FBF6EE"><span class="vi">Đăng tin miễn phí,<br>được xác minh.</span><span class="en">List for free,<br>get verified.</span></h2>
+        <p style="margin:0 0 24px;font-size:16px;line-height:1.65;color:#C9B9A6;max-width:460px"><span class="vi">Tin có dấu kiểm chứng được thuê nhanh hơn — người thuê tin bạn ngay từ lần nhắn đầu tiên.</span><span class="en">Listings with the seal let faster — tenants trust you from the very first message.</span></p>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:30px">
+          <div style="display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#E8B54A"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#33241C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-size:15px;color:#EADFCF"><span class="vi">Miễn phí mãi mãi — không hoa hồng, không phí ẩn</span><span class="en">Free forever — no commission, no hidden fees</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#E8B54A"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#33241C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-size:15px;color:#EADFCF"><span class="vi">Xác minh trong 48 giờ, hỗ trợ bằng tiếng Việt</span><span class="en">Verified within 48 hours, support in Vietnamese</span></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#E8B54A"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#33241C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-size:15px;color:#EADFCF"><span class="vi">Người thuê nghiêm túc từ cộng đồng người Việt</span><span class="en">Serious tenants from the Vietnamese community</span></span></div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <button style="padding:15px 26px;border-radius:14px;border:none;background:#E8B54A;color:#33241C;font-family:'Be Vietnam Pro',sans-serif;font-size:15.5px;font-weight:800;cursor:pointer" style-hover="background:#F2C765"><span class="vi">Đăng tin của bạn</span><span class="en">List your room</span></button>
+          <button style="padding:15px 26px;border-radius:14px;border:1.5px solid #6B5744;background:transparent;color:#EADFCF;font-family:'Be Vietnam Pro',sans-serif;font-size:15.5px;font-weight:600;cursor:pointer" style-hover="border-color:#E8B54A;color:#E8B54A"><span class="vi">Xem quy trình xác minh</span><span class="en">See the verification process</span></button>
+        </div>
+      </div>
+      <!-- verification progress mini-card -->
+      <div style="background:#3E2C21;border:1px solid #57422F;border-radius:20px;padding:26px 28px;justify-self:center;width:340px">
+        <div style="font-size:13px;font-weight:700;color:#C9B9A6;margin-bottom:18px;letter-spacing:0.3px"><span class="vi">HỒ SƠ CỦA BẠN</span><span class="en">YOUR PROFILE</span></div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:11px"><span style="width:26px;height:26px;border-radius:999px;background:#2F7A55;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✓</span><span style="font-size:14.5px;color:#EADFCF"><span class="vi">Giấy tờ tuỳ thân</span><span class="en">Identity documents</span></span></div>
+          <div style="display:flex;align-items:center;gap:11px"><span style="width:26px;height:26px;border-radius:999px;background:#2F7A55;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">✓</span><span style="font-size:14.5px;color:#EADFCF"><span class="vi">Quyền cho thuê nhà</span><span class="en">Right to let</span></span></div>
+          <div style="display:flex;align-items:center;gap:11px"><span style="width:26px;height:26px;border-radius:999px;border:2px dashed #C08A2D;color:#E8B54A;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:none;box-sizing:border-box">…</span><span style="font-size:14.5px;color:#EADFCF"><span class="vi">Tài khoản bảo vệ tiền cọc</span><span class="en">Deposit protection account</span></span></div>
+        </div>
+        <div style="margin-top:22px;border-top:1px solid #57422F;padding-top:18px;display:flex;align-items:center;gap:12px">
+          <svg width="34" height="34" viewBox="0 0 24 24" opacity="0.95"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#E8B54A"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#33241C" stroke-width="1" stroke-dasharray="2.4 2.6"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#33241C" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span style="font-size:13.5px;line-height:1.5;color:#C9B9A6"><span class="vi">Hoàn tất bước cuối để nhận <strong style="color:#E8B54A">dấu kiểm chứng</strong> trên mọi tin đăng.</span><span class="en">Finish the last step to earn the <strong style="color:#E8B54A">verification seal</strong> on every listing.</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div style="padding:56px 48px 40px;text-align:center;background:#FBF6EE">
+    <svg width="34" height="34" viewBox="0 0 24 24" style="margin-bottom:14px"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <div style="font-family:Lora,serif;font-weight:600;font-size:26px;color:#2C201A;margin-bottom:10px"><span class="vi">Kiểm chứng miễn phí. Đăng tin miễn phí. Mãi mãi.</span><span class="en">Verification is free. Listing is free. Forever.</span></div>
+    <p style="margin:0 auto 26px;font-size:14.5px;line-height:1.65;color:#6E5D4F;max-width:640px;text-wrap:pretty"><span class="vi">RentAPlace không giữ tiền của bạn và không xử lý thanh toán trong ứng dụng — tiền cọc luôn nằm trong chương trình bảo vệ của chính phủ Anh (DPS, mydeposits, TDS).</span><span class="en">RentAPlace never holds your money and never processes payments in the app — deposits always sit in a UK government protection scheme (DPS, mydeposits, TDS).</span></p>
+    <div style="display:flex;justify-content:center;gap:24px;font-size:13px;color:#A08B76;font-weight:500">
+      <span>© 2026 RentAPlace</span><span>Manchester · London · Birmingham</span><span>hello@rentaplace.uk</span><span>Zalo OA: RentAPlace</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════ 1b MOBILE LANDING ═══════════════ -->
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Landing — mobile 390 · cùng toggle VI ⇄ EN</div>
+<div class="dv-card" style="width:390px;background:#FBF6EE">
+
+  <!-- nav -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #F0E5D2">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-weight:800;font-size:18px;color:#2C201A">RentAPlace</span>
+    </div>
+    <button onClick="{{ toggleLang }}" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:1.5px solid #E2D4BC;background:#FFFDF8;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;color:#2C201A;cursor:pointer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"></path></svg>
+      <span class="vi">EN</span><span class="en">VI</span>
+    </button>
+  </div>
+
+  <!-- hero -->
+  <div style="padding:36px 22px 40px">
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:14px">
+      <svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#C08A2D"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#C08A2D"><span class="vi">Cho người Việt tại UK</span><span class="en">For Vietnamese in the UK</span></span>
+    </div>
+    <h1 style="margin:0 0 10px;font-family:Lora,serif;font-weight:600;font-size:34px;line-height:1.18;color:#2C201A;text-wrap:pretty"><span class="vi">Phòng đã kiểm chứng. Không lừa đảo. <em style="color:#B23A2E">Bằng tiếng Việt.</em></span><span class="en">Verified rooms. No scams. <em style="color:#B23A2E">In Vietnamese.</em></span></h1>
+    <p style="margin:0 0 8px;font-size:15px;font-weight:500;color:#A08B76"><span class="vi">Verified rooms. No scams. In Vietnamese.</span><span class="en">Phòng đã kiểm chứng. Không lừa đảo.</span></p>
+    <p style="margin:0 0 24px;font-size:14.5px;line-height:1.6;color:#6E5D4F;text-wrap:pretty"><span class="vi">Chúng tôi kiểm tra chủ nhà, ảnh và tiền cọc <strong style="color:#2C201A">trước khi</strong> bạn thấy tin đăng.</span><span class="en">We check the landlord, photos and deposit <strong style="color:#2C201A">before</strong> you see a listing.</span></p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <input class="vi" placeholder="Email của bạn" style="padding:16px 18px;border-radius:14px;border:1.5px solid #E2D4BC;background:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;color:#2C201A;outline:none">
+      <input class="en" placeholder="Your email" style="padding:16px 18px;border-radius:14px;border:1.5px solid #E2D4BC;background:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:15px;color:#2C201A;outline:none">
+      <button style="padding:17px;border-radius:14px;border:none;background:#B23A2E;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:16.5px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(178,58,46,0.28)"><span class="vi">Tìm phòng an toàn</span><span class="en">Find a safe room</span></button>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:13.5px;color:#B23A2E;font-weight:600;text-decoration:underline;text-underline-offset:3px"><span class="vi">hoặc để lại số Zalo →</span><span class="en">or leave your Zalo number →</span></div>
+    <div style="display:flex;justify-content:center;gap:7px;margin-top:22px;align-items:center">
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.6px;color:#A08B76"><span class="vi">CỌC ĐƯỢC BẢO VỆ:</span><span class="en">DEPOSITS PROTECTED:</span></span>
+      <span style="padding:4px 9px;border-radius:6px;border:1.5px solid #E2D4BC;font-size:10px;font-weight:800;color:#8A7860">DPS</span>
+      <span style="padding:4px 9px;border-radius:6px;border:1.5px solid #E2D4BC;font-size:10px;font-weight:800;color:#8A7860">mydeposits</span>
+      <span style="padding:4px 9px;border-radius:6px;border:1.5px solid #E2D4BC;font-size:10px;font-weight:800;color:#8A7860">TDS</span>
+    </div>
+  </div>
+
+  <!-- steps -->
+  <div style="background:#fff;border-top:1px solid #F0E5D2;border-bottom:1px solid #F0E5D2;padding:36px 22px">
+    <h2 style="margin:0 0 20px;font-family:Lora,serif;font-weight:600;font-size:24px;color:#2C201A;text-align:center"><span class="vi">An toàn trong 3 bước</span><span class="en">Safe in three steps</span></h2>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:16px;background:#FBF6EE;border:1px solid #F0E5D2;border-radius:16px;padding:18px 20px;align-items:center">
+        <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:34px;color:#E8B54A;line-height:1;flex:none">1</span>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;color:#2C201A;margin-bottom:3px"><span class="vi">Chúng tôi kiểm tra chủ nhà</span><span class="en">We verify the landlord</span></div>
+          <div style="font-size:13px;line-height:1.55;color:#6E5D4F"><span class="vi">Giấy tờ và quyền cho thuê được xác minh trước khi đăng.</span><span class="en">ID and right to let verified before going live.</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;background:#FBF6EE;border:1px solid #F0E5D2;border-radius:16px;padding:18px 20px;align-items:center">
+        <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:34px;color:#E8B54A;line-height:1;flex:none">2</span>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;color:#2C201A;margin-bottom:3px"><span class="vi">Kiểm tra tiền cọc được bảo vệ</span><span class="en">We check the deposit is protected</span></div>
+          <div style="font-size:13px;line-height:1.55;color:#6E5D4F"><span class="vi">Cọc phải nằm trong chương trình của chính phủ Anh.</span><span class="en">The deposit must sit in a UK government scheme.</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;background:#FBF6EE;border:1px solid #F0E5D2;border-radius:16px;padding:18px 20px;align-items:center">
+        <span style="font-family:Lora,serif;font-style:italic;font-weight:600;font-size:34px;color:#E8B54A;line-height:1;flex:none">3</span>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;color:#2C201A;margin-bottom:3px"><span class="vi">Bạn chuyển vào an toàn</span><span class="en">You move in safely</span></div>
+          <div style="font-size:13px;line-height:1.55;color:#6E5D4F"><span class="vi">Hợp đồng được tóm tắt bằng tiếng Việt trước khi ký.</span><span class="en">The contract is summarised in Vietnamese before you sign.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- comparison (stacked) -->
+  <div style="padding:36px 22px">
+    <h2 style="margin:0 0 20px;font-family:Lora,serif;font-weight:600;font-size:24px;color:#2C201A;text-align:center;text-wrap:pretty"><span class="vi">Tại sao không dùng nhóm Facebook?</span><span class="en">Why not Facebook groups?</span></h2>
+    <div style="background:#F2EFE9;border:1.5px dashed #C9BFAE;border-radius:16px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+        <div style="width:32px;height:32px;border-radius:999px;background:#D8D2C6;display:flex;align-items:center;justify-content:center;color:#9A917F;font-weight:800;font-size:14px">?</div>
+        <div>
+          <div style="font-size:13.5px;font-weight:700;color:#5B5346"><span class="vi">Người dùng ẩn danh</span><span class="en">Anonymous user</span></div>
+          <div style="font-size:11px;color:#9A917F"><span class="vi">Nhóm Facebook · 2 giờ trước</span><span class="en">Facebook group · 2 hrs ago</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#EAD5D0;color:#B23A2E;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✕</span><span style="font-size:13px;color:#5B5346"><span class="vi">Không rõ danh tính người đăng</span><span class="en">Poster's identity unknown</span></span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#EAD5D0;color:#B23A2E;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✕</span><span style="font-size:13px;color:#5B5346"><span class="vi">Cọc chuyển tay — không được bảo vệ</span><span class="en">Deposit changes hands — unprotected</span></span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;margin:-11px 0;position:relative;z-index:2"><span style="width:36px;height:36px;border-radius:999px;background:#2C201A;color:#F6EACB;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,0.2)">VS</span></div>
+    <div style="background:#fff;border:1.5px solid #E8B54A;border-radius:16px;padding:18px 20px;box-shadow:0 12px 30px rgba(178,58,46,0.10)">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+        <svg width="32" height="32" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <div>
+          <div style="font-size:13.5px;font-weight:700;color:#2C201A"><span class="vi">Tin đã kiểm chứng</span><span class="en">Verified listing</span></div>
+          <div style="font-size:11px;color:#A08B76"><span class="vi">RentAPlace · kiểm tra 12/06</span><span class="en">RentAPlace · checked 12 June</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13px;color:#2C201A;font-weight:500"><span class="vi">Chủ nhà đã xác minh danh tính</span><span class="en">Landlord identity verified</span></span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13px;color:#2C201A;font-weight:500"><span class="vi">Cọc trong chương trình chính phủ</span><span class="en">Deposit in a government scheme</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- landlord band -->
+  <div style="background:#33241C;padding:36px 22px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#E8B54A;margin-bottom:10px"><span class="vi">Dành cho chủ nhà</span><span class="en">For landlords</span></div>
+    <h2 style="margin:0 0 8px;font-family:Lora,serif;font-weight:600;font-size:26px;line-height:1.25;color:#FBF6EE"><span class="vi">Đăng tin miễn phí, được xác minh.</span><span class="en">List for free, get verified.</span></h2>
+    <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#C9B9A6"><span class="vi">Tin có dấu kiểm chứng được thuê nhanh hơn.</span><span class="en">Listings with the seal let faster.</span></p>
+    <button style="width:100%;padding:16px;border-radius:14px;border:none;background:#E8B54A;color:#33241C;font-family:'Be Vietnam Pro',sans-serif;font-size:15.5px;font-weight:800;cursor:pointer"><span class="vi">Đăng tin của bạn</span><span class="en">List your room</span></button>
+  </div>
+
+  <!-- footer -->
+  <div style="padding:32px 22px;text-align:center">
+    <svg width="28" height="28" viewBox="0 0 24 24" style="margin-bottom:10px"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <div style="font-family:Lora,serif;font-weight:600;font-size:18px;color:#2C201A;margin-bottom:8px;text-wrap:pretty"><span class="vi">Kiểm chứng miễn phí. Đăng tin miễn phí. Mãi mãi.</span><span class="en">Verification free. Listing free. Forever.</span></div>
+    <p style="margin:0;font-size:12.5px;line-height:1.6;color:#6E5D4F;text-wrap:pretty"><span class="vi">Chúng tôi không giữ tiền và không xử lý thanh toán trong ứng dụng.</span><span class="en">We never hold your money or process payments in the app.</span></p>
+    <div style="margin-top:16px;font-size:11.5px;color:#A08B76">© 2026 RentAPlace · hello@rentaplace.uk · Zalo OA: RentAPlace</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SLOT-1B -->
+
+<!-- ═══════════════ 1c BROWSE ═══════════════ -->
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>App — Tìm phòng (browse) · dấu kiểm chứng là nhân vật chính</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,905px">
+<div style="height:100%;display:flex;flex-direction:column;background:#FBF6EE;font-family:'Be Vietnam Pro',sans-serif;padding-top:60px;box-sizing:border-box;overflow:hidden">
+  <div style="padding:6px 20px 12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:26px;font-weight:800;color:#2C201A">Tìm phòng</span>
+      <span style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:#fff;border:1.5px solid #E2D4BC;font-size:13.5px;font-weight:700;color:#2C201A"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B23A2E" stroke-width="2.2" stroke-linecap="round"><path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>Manchester ▾</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <span style="padding:9px 14px;border-radius:999px;background:#B23A2E;color:#fff;font-size:13px;font-weight:700">Người Việt ở cùng</span>
+      <span style="padding:9px 14px;border-radius:999px;background:#fff;border:1.5px solid #E2D4BC;font-size:13px;font-weight:600;color:#6E5D4F">Giá ≤ £600</span>
+      <span style="padding:9px 14px;border-radius:999px;background:#fff;border:1.5px solid #E2D4BC;font-size:13px;font-weight:600;color:#6E5D4F">Gần trường</span>
+    </div>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:2px 20px 0;display:flex;flex-direction:column;gap:14px">
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(60,40,20,0.06);flex:none">
+      <div style="position:relative">
+        <div style="height:168px;background:repeating-linear-gradient(45deg,#EFE3CF 0 12px,#E9DCC4 12px 24px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A7860">[ ảnh thật của phòng ]</div>
+        <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 11px 6px 7px;box-shadow:0 3px 10px rgba(0,0,0,0.14)">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span style="font-size:11.5px;font-weight:800;color:#2C201A">Đã kiểm chứng</span>
+        </div>
+        <div style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:999px;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E5D4F" stroke-width="2"><path d="M12 20s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 9c0 5.5-8 11-8 11z"></path></svg></div>
+      </div>
+      <div style="padding:14px 16px 15px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:20px;font-weight:800;color:#2C201A">£520<span style="font-size:13px;font-weight:600;color:#A08B76">/tháng</span></span>
+          <span style="padding:5px 10px;border-radius:999px;background:#F6EACB;color:#8A6215;font-size:11.5px;font-weight:700">2 người Việt đang ở</span>
+        </div>
+        <div style="font-size:13.5px;color:#6E5D4F;margin-bottom:10px">Phòng đôi · Fallowfield · 15 phút đến ĐH Manchester</div>
+        <div style="display:flex;align-items:center;gap:7px;border-top:1px solid #F5EBDA;padding-top:10px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2F7A55" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7.5 3v5.5c0 5-3.2 8.7-7.5 10.5-4.3-1.8-7.5-5.5-7.5-10.5V5.5z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>
+          <span style="font-size:12.5px;font-weight:700;color:#2F7A55">Cọc được bảo vệ tại DPS</span>
+          <span style="margin-left:auto;font-size:12px;color:#A08B76">Chú Hùng ✓</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:18px;overflow:hidden;box-shadow:0 4px 14px rgba(60,40,20,0.06);flex:none">
+      <div style="position:relative">
+        <div style="height:120px;background:repeating-linear-gradient(45deg,#EFE3CF 0 12px,#E9DCC4 12px 24px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A7860">[ ảnh thật của phòng ]</div>
+        <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 11px 6px 7px;box-shadow:0 3px 10px rgba(0,0,0,0.14)">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span style="font-size:11.5px;font-weight:800;color:#2C201A">Đã kiểm chứng</span>
+        </div>
+      </div>
+      <div style="padding:14px 16px 15px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:20px;font-weight:800;color:#2C201A">£480<span style="font-size:13px;font-weight:600;color:#A08B76">/tháng</span></span>
+          <span style="padding:5px 10px;border-radius:999px;background:#F6EACB;color:#8A6215;font-size:11.5px;font-weight:700">1 người Việt đang ở</span>
+        </div>
+        <div style="font-size:13.5px;color:#6E5D4F">Phòng đơn · Rusholme · gần chợ Á</div>
+      </div>
+    </div>
+  </div>
+  <div style="flex:none;display:flex;background:#FFFDF8;border-top:1px solid #F0E5D2;padding:10px 10px 26px">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:#B23A2E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span style="font-size:10.5px;font-weight:700">Tìm phòng</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:#A08B76"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 9c0 5.5-8 11-8 11z"></path></svg><span style="font-size:10.5px;font-weight:600">Đã lưu</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:#A08B76"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"></path></svg><span style="font-size:10.5px;font-weight:600">Tin nhắn</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:#A08B76"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"></path></svg><span style="font-size:10.5px;font-weight:600">Hồ sơ</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<!-- ═══════════════ 1d LISTING DETAIL ═══════════════ -->
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>App — Chi tiết tin đăng · checklist kiểm chứng</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,905px">
+<div style="height:100%;display:flex;flex-direction:column;background:#FBF6EE;font-family:'Be Vietnam Pro',sans-serif;box-sizing:border-box;overflow:hidden">
+  <div style="position:relative;flex:none">
+    <div style="height:236px;background:repeating-linear-gradient(45deg,#EFE3CF 0 12px,#E9DCC4 12px 24px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A7860">[ ảnh thật — 8 ảnh, vuốt để xem ]</div>
+    <div style="position:absolute;top:66px;left:16px;width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,0.94);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C201A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></div>
+    <div style="position:absolute;bottom:12px;left:16px;display:flex;align-items:center;gap:6px;background:rgba(44,32,26,0.85);border-radius:999px;padding:6px 12px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8B54A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"></path></svg>
+      <span style="font-size:11.5px;font-weight:700;color:#fff">Ảnh thật · kiểm tra 12/06</span>
+    </div>
+    <div style="position:absolute;bottom:14px;right:16px;display:flex;gap:4px"><span style="width:6px;height:6px;border-radius:99px;background:#fff"></span><span style="width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,0.45)"></span><span style="width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,0.45)"></span></div>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:16px 20px 0">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px">
+      <span style="font-size:26px;font-weight:800;color:#2C201A">£520<span style="font-size:14px;font-weight:600;color:#A08B76">/tháng</span></span>
+      <span style="font-size:12.5px;font-weight:700;color:#2F7A55">Còn trống từ 01/08</span>
+    </div>
+    <div style="font-size:14.5px;color:#6E5D4F;margin-bottom:14px">Phòng đôi tại Fallowfield, Manchester · đã gồm hoá đơn</div>
+    <div style="background:#fff;border:1.5px solid #E8B54A;border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:0 8px 22px rgba(178,58,46,0.08)">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font-size:15px;font-weight:800;color:#2C201A">Kiểm chứng bởi RentAPlace</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:21px;height:21px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13.5px;color:#2C201A;font-weight:500">Chủ nhà đã xác minh danh tính</span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:21px;height:21px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13.5px;color:#2C201A;font-weight:500">Ảnh thật — chụp tại chỗ</span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:21px;height:21px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13.5px;color:#2C201A;font-weight:500">Cọc được bảo vệ (DPS)</span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:21px;height:21px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13.5px;color:#2C201A;font-weight:500">Hợp đồng đã kiểm tra — <span style="color:#B23A2E;font-weight:700;text-decoration:underline;text-underline-offset:2px">xem tóm tắt tiếng Việt</span></span></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="width:44px;height:44px;border-radius:999px;background:#F6EACB;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#8A6215;flex:none">H</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:14.5px;font-weight:700;color:#2C201A">Chú Hùng (Hùng Trần)</span><svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+        <div style="font-size:12px;color:#A08B76">3 hợp đồng hoàn tất · trả lời trong ~2 giờ</div>
+      </div>
+      <span style="font-size:12.5px;font-weight:700;color:#B23A2E">Xem hồ sơ →</span>
+    </div>
+  </div>
+  <div style="flex:none;padding:12px 20px 28px;background:#FFFDF8;border-top:1px solid #F0E5D2">
+    <button style="width:100%;padding:17px;border-radius:16px;border:none;background:#B23A2E;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:16.5px;font-weight:700;box-shadow:0 6px 18px rgba(178,58,46,0.28)">Nhắn tin cho chủ nhà</button>
+    <div style="text-align:center;margin-top:8px;font-size:11.5px;color:#A08B76">Miễn phí · Không thanh toán qua ứng dụng</div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<!-- ═══════════════ 1e LANDLORD PROFILE ═══════════════ -->
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>App — Hồ sơ chủ nhà · uy tín &amp; lịch sử</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,905px">
+<div style="height:100%;display:flex;flex-direction:column;background:#FBF6EE;font-family:'Be Vietnam Pro',sans-serif;padding-top:58px;box-sizing:border-box;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:12px;padding:8px 20px 6px">
+    <span style="width:34px;height:34px;border-radius:999px;background:#fff;border:1.5px solid #E2D4BC;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2C201A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></span>
+    <span style="font-size:16px;font-weight:800;color:#2C201A">Hồ sơ chủ nhà</span>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:10px 20px 20px">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="position:relative;display:inline-block">
+        <div style="width:76px;height:76px;border-radius:999px;background:#F6EACB;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#8A6215;border:2.5px solid #E8B54A">H</div>
+        <svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;right:-6px;bottom:-2px"><path d="M12 1l3.1 3.1h4.8v4.8L23 12l-3.1 3.1v4.8h-4.8L12 23l-3.1-3.1H4.1v-4.8L1 12l3.1-3.1V4.1h4.8z" fill="#B23A2E"></path><circle cx="12" cy="12" r="7.6" fill="none" stroke="#E8B54A" stroke-width="1" stroke-dasharray="2.4 2.6" opacity="0.9"></circle><path d="M7.8 12.2l2.8 2.9 5.6-6.3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </div>
+      <div style="font-size:19px;font-weight:800;color:#2C201A;margin-top:8px">Hùng Trần <span style="font-weight:600;color:#A08B76">(Chú Hùng)</span></div>
+      <div style="font-size:12.5px;color:#6E5D4F">Chủ nhà tại Manchester · trên RentAPlace từ 2023</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:7px 14px;border-radius:999px;background:#B23A2E;color:#fff;font-size:12.5px;font-weight:700">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"></path></svg>
+        Đã xác minh danh tính
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:#fff;border:1px solid #EFE3CF;border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#2C201A">3</div><div style="font-size:10.5px;line-height:1.4;color:#6E5D4F;font-weight:600">hợp đồng<br>hoàn tất</div></div>
+      <div style="background:#fff;border:1px solid #EFE3CF;border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#2F7A55">100%</div><div style="font-size:10.5px;line-height:1.4;color:#6E5D4F;font-weight:600">cọc hoàn trả<br>đầy đủ</div></div>
+      <div style="background:#fff;border:1px solid #EFE3CF;border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#2C201A">~2h</div><div style="font-size:10.5px;line-height:1.4;color:#6E5D4F;font-weight:600">thời gian<br>trả lời</div></div>
+    </div>
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76;margin-bottom:10px">NHÀ XỊN ĐÃ KIỂM TRA</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13px;color:#2C201A;font-weight:500">Giấy tờ tuỳ thân</span><span style="margin-left:auto;font-size:11px;color:#A08B76">05/2023</span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13px;color:#2C201A;font-weight:500">Quyền cho thuê nhà</span><span style="margin-left:auto;font-size:11px;color:#A08B76">05/2023</span></div>
+        <div style="display:flex;align-items:center;gap:9px"><span style="width:20px;height:20px;border-radius:999px;background:#E4F0E7;color:#2F7A55;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex:none">✓</span><span style="font-size:13px;color:#2C201A;font-weight:500">Tài khoản bảo vệ cọc (DPS)</span><span style="margin-left:auto;font-size:11px;color:#A08B76">06/2023</span></div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76;margin-bottom:8px">NGƯỜI THUÊ CŨ NÓI GÌ</div>
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:13px 16px;margin-bottom:8px">
+      <div style="color:#E8B54A;font-size:13px;letter-spacing:2px;margin-bottom:4px">★★★★★</div>
+      <div style="font-size:13px;line-height:1.55;color:#2C201A;margin-bottom:6px">"Chú Hùng trả cọc đầy đủ ngay tuần em dọn ra. Có gì hỏng sửa rất nhanh."</div>
+      <div style="font-size:11.5px;color:#A08B76">Chị Mai · sinh viên, ở 12 tháng</div>
+    </div>
+    <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:13px 16px">
+      <div style="color:#E8B54A;font-size:13px;letter-spacing:2px;margin-bottom:4px">★★★★★</div>
+      <div style="font-size:13px;line-height:1.55;color:#2C201A;margin-bottom:6px">"Hợp đồng rõ ràng, đúng như bản tóm tắt tiếng Việt trên app."</div>
+      <div style="font-size:11.5px;color:#A08B76">Anh Tuấn · làm nghề nail, ở 8 tháng</div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<!-- ═══════════════ 1f CONTRACT SUMMARY ═══════════════ -->
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>App — Tóm tắt hợp đồng bằng tiếng Việt (AST)</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,905px">
+<div style="height:100%;display:flex;flex-direction:column;background:#FBF6EE;font-family:'Be Vietnam Pro',sans-serif;padding-top:58px;box-sizing:border-box;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:12px;padding:8px 20px 4px">
+    <span style="width:34px;height:34px;border-radius:999px;background:#fff;border:1.5px solid #E2D4BC;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2C201A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></span>
+    <div>
+      <div style="font-size:16px;font-weight:800;color:#2C201A">Tóm tắt hợp đồng</div>
+      <div style="font-size:11px;color:#A08B76">AST — Hợp đồng thuê tiêu chuẩn của Anh</div>
+    </div>
+  </div>
+  <div style="flex:1;overflow:hidden;padding:10px 20px 20px">
+    <div style="background:#F6EACB;border-radius:14px;padding:12px 15px;display:flex;gap:10px;align-items:flex-start;margin-bottom:12px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A6215" stroke-width="2" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v0.5M12 11.5V16" stroke-linecap="round"></path></svg>
+      <span style="font-size:12.5px;line-height:1.55;color:#6B4E12">Giải thích bằng tiếng Việt dễ hiểu. Bản gốc tiếng Anh vẫn là văn bản pháp lý.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
+      <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76">TIỀN THUÊ</span>
+          <span style="font-size:19px;font-weight:800;color:#B23A2E">£520<span style="font-size:12px;font-weight:600;color:#A08B76">/tháng</span></span>
+        </div>
+        <div style="font-size:12.5px;line-height:1.55;color:#6E5D4F">Trả trước ngày 01 hằng tháng. <strong style="color:#2C201A">Đã gồm</strong> điện, nước, mạng.</div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #2F7A55;border-radius:16px;padding:14px 16px;box-shadow:0 6px 16px rgba(47,122,85,0.10)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76">TIỀN CỌC</span>
+          <span style="font-size:19px;font-weight:800;color:#2C201A">£600</span>
+        </div>
+        <div style="font-size:12.5px;line-height:1.55;color:#6E5D4F;margin-bottom:8px">Được giữ tại <strong style="color:#2C201A">DPS</strong> — chủ nhà <strong style="color:#2C201A">không cầm tiền</strong> của bạn.</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#E4F0E7;color:#2F7A55;font-size:11.5px;font-weight:700">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2F7A55" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l7.5 3v5.5c0 5-3.2 8.7-7.5 10.5-4.3-1.8-7.5-5.5-7.5-10.5V5.5z"></path></svg>
+          Đã xác nhận với DPS · 14/06
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+        <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:14px 16px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76;margin-bottom:4px">BÁO TRƯỚC</div>
+          <div style="font-size:19px;font-weight:800;color:#2C201A;margin-bottom:3px">1 tháng</div>
+          <div style="font-size:12px;line-height:1.5;color:#6E5D4F">Muốn dọn ra, báo trước bằng văn bản.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #EFE3CF;border-radius:16px;padding:14px 16px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#A08B76;margin-bottom:4px">THỜI HẠN</div>
+          <div style="font-size:19px;font-weight:800;color:#2C201A;margin-bottom:3px">12 tháng</div>
+          <div style="font-size:12px;line-height:1.5;color:#6E5D4F">01/08/2026 → 31/07/2027.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;background:#E4F0E7;border-radius:14px;padding:12px 15px;margin-bottom:10px">
+      <span style="width:22px;height:22px;border-radius:999px;background:#2F7A55;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:none">✓</span>
+      <span style="font-size:13px;font-weight:700;color:#2F7A55">Không phát hiện điều khoản bất thường</span>
+    </div>
+    <div style="text-align:center;font-size:13px;font-weight:700;color:#B23A2E;text-decoration:underline;text-underline-offset:3px">Xem bản gốc tiếng Anh (PDF) →</div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<!-- SLOT-PHONES -->
+
+</div>
+<p class="dv-next"><span>Thử tiếp / try next: "make the hero badge bigger" · "warmer, more community photos feel" · "show the EN version side-by-side" · "riff on the seal mark"</span></p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vi&quot;,&quot;en&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Ngôn ngữ / Language&quot;}}">
+class Component extends DCLogic {
+  state = { lang: null };
+
+  getLang() {
+    return this.state.lang ?? this.props.lang ?? 'en';
+  }
+
+  syncBody() {
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.setAttribute('data-lang', this.getLang());
+    }
+  }
+
+  componentDidMount() { this.syncBody(); }
+  componentDidUpdate() { this.syncBody(); }
+
+  renderVals() {
+    const lang = this.getLang();
+    return {
+      lang,
+      toggleLang: () => this.setState({ lang: lang === 'vi' ? 'en' : 'vi' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

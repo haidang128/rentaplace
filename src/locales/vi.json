@@ -1,0 +1,227 @@
+{
+  "common": {
+    "appName": "RentAPlace",
+    "verified": "Đã kiểm chứng",
+    "verifiedListing": "Tin đã kiểm chứng",
+    "verifiedLandlord": "chủ nhà đã xác minh",
+    "identityVerified": "Đã xác minh danh tính",
+    "perMonth": "tháng",
+    "free": "Miễn phí",
+    "seeMore": "Xem thêm",
+    "back": "Quay lại",
+    "confirm": "Xác nhận",
+    "notYet": "Chưa",
+    "learnMore": "Tìm hiểu thêm"
+  },
+  "tabs": {
+    "browse": "Tìm phòng",
+    "saved": "Đã lưu",
+    "messages": "Tin nhắn",
+    "profile": "Hồ sơ"
+  },
+  "landing": {
+    "nav": {
+      "how": "Cách hoạt động",
+      "safe": "Vì sao an toàn",
+      "landlords": "Cho chủ nhà",
+      "langButton": "English",
+      "langButtonShort": "EN",
+      "cta": "Tìm phòng"
+    },
+    "hero": {
+      "eyebrow": "Dành cho người Việt tại Vương quốc Anh",
+      "titleLines": ["Phòng đã kiểm chứng.", "Không lừa đảo."],
+      "titleAccent": "Bằng tiếng Việt.",
+      "subEcho": "Verified rooms. No scams. In Vietnamese.",
+      "body": "Chúng tôi kiểm tra chủ nhà và ảnh trước khi bạn thấy tin đăng — và đảm bảo bạn biết chính xác tiền cọc của mình phải được bảo vệ thế nào.",
+      "emailPlaceholder": "Email của bạn",
+      "cta": "Tìm phòng an toàn",
+      "zaloLink": "hoặc để lại số Zalo →",
+      "privacy": "Miễn phí · Không chia sẻ thông tin của bạn",
+      "depositStrip": "Chúng tôi hướng dẫn bạn kiểm tra cọc theo quy định UK",
+      "cardBadge": "Chủ nhà cam kết: cọc bảo vệ tại DPS — chứng chỉ đã kiểm tra",
+      "cardFlatmates": "2 người Việt đang ở",
+      "cardRoom": "Phòng đôi · Fallowfield, Manchester",
+      "cardPhotoPlaceholder": "[ ảnh thật của phòng — đội RentAPlace chụp ]",
+      "cardLandlord": "Chú Hùng — chủ nhà đã xác minh"
+    },
+    "steps": {
+      "title": "An toàn trong 3 bước",
+      "sub": "Mọi tin đăng đều qua ba lớp kiểm tra trước khi đến với bạn.",
+      "s1Title": "Chúng tôi kiểm tra chủ nhà",
+      "s1Body": "Giấy tờ tuỳ thân và quyền cho thuê được xác minh trước khi tin được đăng.",
+      "s2Title": "Bạn nắm rõ quyền về tiền cọc",
+      "s2Body": "Chủ nhà cam kết chương trình bảo vệ cọc (DPS, mydeposits, TDS) và xuất trình chứng chỉ từ hợp đồng trước. Chúng tôi chỉ cho bạn chính xác giấy tờ phải đòi sau khi đóng cọc — và cách đòi bồi thường 1–3 lần tiền cọc nếu chủ nhà không bảo vệ.",
+      "s3Title": "Bạn chuyển vào an toàn",
+      "s3Body": "Hợp đồng được tóm tắt bằng tiếng Việt dễ hiểu trước khi bạn ký."
+    },
+    "compare": {
+      "title": "Tại sao không dùng nhóm Facebook?",
+      "sub": "Cùng một căn phòng — hai mức độ an toàn rất khác nhau.",
+      "anonName": "Người dùng ẩn danh",
+      "anonMeta": "Nhóm Facebook · 2 giờ trước",
+      "anonPoint1": "Không biết ai đứng sau bài đăng",
+      "anonPoint2": "Cọc chuyển tay — mất là mất luôn",
+      "anonPoint3": "Ảnh có thể lấy từ trên mạng",
+      "anonRisk": "⚠ Rủi ro lừa đảo cao",
+      "verifiedMeta": "RentAPlace · kiểm tra ngày 12/06",
+      "verifiedPoint1": "Chủ nhà đã xác minh danh tính",
+      "verifiedPoint2": "Cam kết bảo vệ cọc — chứng chỉ đã kiểm tra",
+      "verifiedPoint3": "Ảnh thật — đội RentAPlace chụp tại chỗ",
+      "verifiedSafe": "✓ An toàn để chuyển vào"
+    },
+    "landlordBand": {
+      "eyebrow": "Dành cho chủ nhà",
+      "title": "Đăng tin miễn phí, được xác minh.",
+      "body": "Tin có dấu kiểm chứng được thuê nhanh hơn — người thuê tin bạn ngay từ lần nhắn đầu tiên.",
+      "point1": "Miễn phí mãi mãi — không hoa hồng, không phí ẩn",
+      "point2": "Xác minh trong 48 giờ, hỗ trợ bằng tiếng Việt",
+      "point3": "Người thuê nghiêm túc từ cộng đồng người Việt",
+      "cta": "Đăng tin của bạn",
+      "ctaSecondary": "Xem quy trình xác minh",
+      "profileTitle": "HỒ SƠ CỦA BẠN",
+      "profileStep1": "Giấy tờ tuỳ thân",
+      "profileStep2": "Quyền cho thuê nhà",
+      "profileStep3": "Cam kết bảo vệ cọc + chứng chỉ hợp đồng trước",
+      "profileHint": "Hoàn tất bước cuối để nhận dấu kiểm chứng trên mọi tin đăng."
+    },
+    "footer": {
+      "tagline": "Kiểm chứng miễn phí. Đăng tin miễn phí. Mãi mãi.",
+      "body": "RentAPlace không giữ tiền của bạn và không xử lý thanh toán trong ứng dụng. Chúng tôi xác minh chủ nhà, yêu cầu cam kết bảo vệ cọc, và hướng dẫn bạn tự xác minh tiền cọc của mình với DPS, mydeposits hoặc TDS.",
+      "cities": "Manchester · London · Birmingham",
+      "email": "hello@rentaplace.uk",
+      "zalo": "Zalo OA: RentAPlace"
+    }
+  },
+  "trust": {
+    "tier1Chip": "Cam kết: {{scheme}}",
+    "tier2Chip": "Cam kết: {{scheme}} · chứng chỉ ✓",
+    "tier3Chip": "Cọc: người thuê đã xác nhận ✓",
+    "sealTitle": "Kiểm chứng bởi RentAPlace",
+    "checkIdentity": "Chủ nhà đã xác minh danh tính",
+    "checkPhotos": "Ảnh thật — chụp tại chỗ",
+    "checkDepositPledge": "Cam kết cọc: {{scheme}} — chứng chỉ từ hợp đồng trước đã kiểm tra",
+    "checkDepositDeclaredOnly": "Cam kết cọc: {{scheme}} — chưa nộp chứng chỉ",
+    "checkContract": "Hợp đồng đã kiểm tra — xem tóm tắt tiếng Việt",
+    "rightsRow": "Quyền tiền cọc của bạn — đọc trước khi đóng tiền →",
+    "lodgerRow": "Chủ nhà sống cùng nhà — quy định cọc khác, xem hướng dẫn lodger →",
+    "profileCertificate": "Chứng chỉ bảo vệ cọc ({{scheme}}) — hợp đồng trước, đã che tên người thuê",
+    "profileBadge": "Bảo vệ cọc ✓ · {{count}} người thuê xác nhận",
+    "statTenancies": "hợp đồng hoàn tất",
+    "statDepositsReturned": "cọc hoàn trả đầy đủ",
+    "statDepositsCaption": "theo xác nhận của người thuê cũ",
+    "statResponseTime": "thời gian trả lời"
+  },
+  "handbook": {
+    "title": "Cẩm nang tiền cọc",
+    "subtitle": "Thứ quý nhất chúng tôi tặng bạn — biết luật là giữ được tiền.",
+    "disclaimer": "Đây là thông tin chung, không phải tư vấn pháp lý. Cần trợ giúp riêng: Shelter 0808 800 4444 (miễn phí) hoặc gov.uk.",
+    "s1": {
+      "title": "Trước khi đóng cọc",
+      "intro": "Đừng để mất tiền trước cả khi có chìa khoá.",
+      "items": [
+        "Không bao giờ đưa tiền mặt mà không có biên lai — chuyển khoản có ghi rõ nội dung là tốt nhất.",
+        "Cọc tối đa theo luật = 5 tuần tiền thuê (với thuê dưới £50.000/năm). Thuê £520/tháng → cọc tối đa £600.",
+        "Kiểm tra đúng người: tên chủ nhà trên hợp đồng phải khớp hồ sơ đã xác minh trên RentAPlace.",
+        "Chỉ đóng cọc sau khi đã xem phòng (trực tiếp hoặc video call trực tiếp trong phòng)."
+      ]
+    },
+    "s2": {
+      "title": "Sau khi đóng cọc — quy tắc 30 ngày",
+      "intro": "Trong vòng 30 ngày kể từ khi bạn đóng cọc, chủ nhà bắt buộc phải bảo vệ cọc trong một chương trình của chính phủ và gửi cho bạn giấy tờ. Hãy đòi đủ:",
+      "items": [
+        "① Biên lai xác nhận số tiền cọc.",
+        "② Chứng chỉ bảo vệ cọc, ghi rõ tên chương trình: DPS, mydeposits hoặc TDS.",
+        "③ 'Prescribed information' — bộ thông tin quy định (địa chỉ, số tiền, cách lấy lại cọc).",
+        "④ Tự kiểm tra miễn phí trên trang của chương trình — chỉ cần mã cọc hoặc họ tên + mã bưu điện + ngày bắt đầu thuê."
+      ],
+      "checkerLinks": "Kiểm tra cọc của bạn: DPS · mydeposits · TDS — miễn phí, 1 phút."
+    },
+    "s3": {
+      "title": "Đòn bẩy của bạn",
+      "intro": "Nếu quá 30 ngày mà cọc chưa được bảo vệ hoặc bạn chưa nhận đủ giấy tờ:",
+      "items": [
+        "Bước 1 — Gửi thư yêu cầu (chúng tôi có mẫu sẵn tiếng Việt + tiếng Anh). Đa số chủ nhà tuân thủ ngay khi biết bạn hiểu luật.",
+        "Bước 2 — Nếu vẫn không: bạn có quyền kiện ra toà án quận và đòi bồi thường 1 đến 3 lần tiền cọc (toà quyết định mức). Cọc £600 → có thể được trả £600–£1.800, cộng với tiền cọc.",
+        "Chủ nhà chưa bảo vệ cọc cũng không thể dùng thủ tục đòi nhà tiêu chuẩn — thêm một lá chắn cho bạn.",
+        "Quyền kiện vẫn còn kể cả khi bạn đã dọn ra."
+      ]
+    },
+    "s4": {
+      "title": "Chủ nhà sống cùng nhà? (Lodger)",
+      "intro": "Nếu bạn thuê phòng trong nhà mà chủ nhà đang ở, bạn là 'lodger' — luật bảo vệ cọc KHÔNG áp dụng. Không có chương trình, không có mức phạt 1–3 lần. Thay vào đó, hãy đòi:",
+      "items": [
+        "Hợp đồng bằng văn bản, ghi rõ số tiền cọc và điều kiện trả lại.",
+        "Biên lai tiền cọc.",
+        "Biên bản hiện trạng phòng khi vào ở, kèm ảnh chụp có ngày tháng.",
+        "Cọc vẫn phải được trả lại theo hợp đồng — biên bản + ảnh là bằng chứng của bạn."
+      ]
+    },
+    "s5": {
+      "title": "Khi dọn ra",
+      "intro": "Lấy lại cọc đầy đủ:",
+      "items": [
+        "Chủ nhà chỉ được trừ tiền khi có bằng chứng (hư hỏng vượt hao mòn tự nhiên, nợ tiền thuê).",
+        "Không đồng ý với khoản trừ? Dùng dịch vụ giải quyết tranh chấp miễn phí của chính chương trình (DPS/mydeposits/TDS) — không cần ra toà.",
+        "Chụp ảnh phòng ngày dọn ra, giống biên bản lúc vào.",
+        "Đánh giá chủ nhà trên RentAPlace — 'trả cọc đầy đủ ✓' giúp người thuê sau và giúp chủ nhà tốt."
+      ]
+    }
+  },
+  "contract": {
+    "title": "Tóm tắt hợp đồng",
+    "subtitle": "Hợp đồng thuê định kỳ — chuẩn mới của Anh từ 05/2026",
+    "banner": "Giải thích bằng tiếng Việt dễ hiểu. Bản gốc tiếng Anh vẫn là văn bản pháp lý.",
+    "rentLabel": "TIỀN THUÊ",
+    "rentBody": "Trả trước ngày {{day}} hằng tháng. Đã gồm điện, nước, mạng.",
+    "depositLabel": "TIỀN CỌC",
+    "depositBody": "Chủ nhà cam kết giữ tại {{scheme}}. Sau khi đóng cọc, trong vòng 30 ngày bạn phải nhận: chứng chỉ bảo vệ cọc + thông tin quy định (prescribed information).",
+    "depositCapNote": "£{{amount}} = mức tối đa luật cho phép với giá thuê này (5 tuần tiền thuê).",
+    "depositPending": "Chưa xác nhận — kiểm tra sau khi chuyển vào",
+    "depositConfirmed": "Bạn đã xác nhận với {{scheme}} · {{date}}",
+    "noticeLabel": "BÁO TRƯỚC",
+    "noticeValue": "2 tháng",
+    "noticeBody": "Muốn dọn ra, báo trước 2 tháng bằng văn bản.",
+    "termLabel": "THỜI HẠN",
+    "termValue": "Định kỳ",
+    "termBody": "Không thời hạn cố định. Không ai có thể 'hết hạn' đuổi bạn; chủ nhà cần lý do luật định.",
+    "noOddClauses": "Không phát hiện điều khoản bất thường",
+    "viewOriginal": "Xem bản gốc tiếng Anh (PDF) →",
+    "disclaimer": "Đây là thông tin chung, không phải tư vấn pháp lý. Bản gốc tiếng Anh là văn bản pháp lý. Cần trợ giúp: Shelter 0808 800 4444.",
+    "lodgerBanner": "Bạn là lodger (chủ nhà sống cùng nhà) — luật bảo vệ cọc không áp dụng. Xem hướng dẫn lodger trong Cẩm nang tiền cọc."
+  },
+  "day30": {
+    "day7Title": "Bạn đã nhận biên lai tiền cọc chưa?",
+    "day7Body": "Biên lai là bước 1 trong 4 giấy tờ bạn cần. Mở cẩm nang để xem đủ.",
+    "day25Title": "Ngày 25/30 — chủ nhà đã gửi chứng chỉ bảo vệ cọc chưa?",
+    "day25Received": "Đã nhận — xác nhận",
+    "day25NotYet": "Chưa — xem việc cần làm",
+    "confirmPrompt": "Tuyệt! Kiểm tra cọc trên trang {{scheme}} (miễn phí, 1 phút) rồi bấm xác nhận — chủ nhà tốt xứng đáng được ghi nhận.",
+    "confirmButton": "Tôi đã kiểm tra — cọc được bảo vệ ✓",
+    "overdueTitle": "Quá 30 ngày — đến lúc dùng đòn bẩy của bạn",
+    "overdueBody": "Mở thư mẫu yêu cầu bảo vệ cọc. Đa số chủ nhà tuân thủ ngay."
+  },
+  "listing": {
+    "availableFrom": "Còn trống từ {{date}}",
+    "billsIncluded": "đã gồm hoá đơn",
+    "messageLandlord": "Nhắn tin cho chủ nhà",
+    "noPayment": "Miễn phí · Không thanh toán qua ứng dụng",
+    "viewProfile": "Xem hồ sơ →",
+    "realPhotos": "Ảnh thật · kiểm tra {{date}}",
+    "flatmatesVietnamese": "{{count}} người Việt đang ở"
+  },
+  "browse": {
+    "title": "Tìm phòng",
+    "filterFlatmates": "Người Việt ở cùng",
+    "filterPrice": "Giá ≤ £600",
+    "filterNearUni": "Gần trường"
+  },
+  "landlordProfile": {
+    "title": "Hồ sơ chủ nhà",
+    "memberSince": "Chủ nhà tại {{city}} · trên RentAPlace từ {{year}}",
+    "checksTitle": "NHÀ XỊN ĐÃ KIỂM TRA",
+    "checkId": "Giấy tờ tuỳ thân",
+    "checkRightToLet": "Quyền cho thuê nhà",
+    "reviewsTitle": "NGƯỜI THUÊ CŨ NÓI GÌ"
+  }
+}

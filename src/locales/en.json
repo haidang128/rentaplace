@@ -1,0 +1,227 @@
+{
+  "common": {
+    "appName": "RentAPlace",
+    "verified": "Verified",
+    "verifiedListing": "Verified listing",
+    "verifiedLandlord": "verified landlord",
+    "identityVerified": "Identity verified",
+    "perMonth": "month",
+    "free": "Free",
+    "seeMore": "See more",
+    "back": "Back",
+    "confirm": "Confirm",
+    "notYet": "Not yet",
+    "learnMore": "Learn more"
+  },
+  "tabs": {
+    "browse": "Browse",
+    "saved": "Saved",
+    "messages": "Messages",
+    "profile": "Profile"
+  },
+  "landing": {
+    "nav": {
+      "how": "How it works",
+      "safe": "Why it's safe",
+      "landlords": "For landlords",
+      "langButton": "Tiếng Việt",
+      "langButtonShort": "VI",
+      "cta": "Find a room"
+    },
+    "hero": {
+      "eyebrow": "For the Vietnamese community in the UK",
+      "titleLines": ["Verified rooms.", "No scams."],
+      "titleAccent": "In Vietnamese.",
+      "subEcho": "Phòng đã kiểm chứng. Không lừa đảo. Bằng tiếng Việt.",
+      "body": "We check the landlord and the photos before you ever see a listing — and make sure you know exactly how your deposit must be protected.",
+      "emailPlaceholder": "Your email",
+      "cta": "Find a safe room",
+      "zaloLink": "or leave your Zalo number →",
+      "privacy": "Free · We never share your details",
+      "depositStrip": "We show you how to check your deposit under UK rules",
+      "cardBadge": "Landlord pledge: deposit protected at DPS — certificate reviewed",
+      "cardFlatmates": "2 Vietnamese flatmates",
+      "cardRoom": "Double room · Fallowfield, Manchester",
+      "cardPhotoPlaceholder": "[ real room photo — shot by our team ]",
+      "cardLandlord": "Mr Hùng — verified landlord"
+    },
+    "steps": {
+      "title": "Safe in three steps",
+      "sub": "Every listing passes three checks before it reaches you.",
+      "s1Title": "We verify the landlord",
+      "s1Body": "Identity documents and the right to let are verified before the listing goes live.",
+      "s2Title": "You know your deposit rights",
+      "s2Body": "The landlord pledges a protection scheme (DPS, mydeposits or TDS) and shows a certificate from a past tenancy. We show you exactly what to demand after you pay — and how to claim 1–3× your deposit back if they fail to protect it.",
+      "s3Title": "You move in safely",
+      "s3Body": "The contract is summarised in plain Vietnamese before you sign anything."
+    },
+    "compare": {
+      "title": "Why not Facebook groups?",
+      "sub": "The same room — two very different levels of safety.",
+      "anonName": "Anonymous user",
+      "anonMeta": "Facebook group · 2 hrs ago",
+      "anonPoint1": "No idea who is behind the post",
+      "anonPoint2": "Deposit changes hands — gone is gone",
+      "anonPoint3": "Photos may be pulled off the internet",
+      "anonRisk": "⚠ High scam risk",
+      "verifiedMeta": "RentAPlace · checked 12 June",
+      "verifiedPoint1": "Landlord identity verified",
+      "verifiedPoint2": "Deposit pledge — certificate on file",
+      "verifiedPoint3": "Real photos — taken on site by our team",
+      "verifiedSafe": "✓ Safe to move in"
+    },
+    "landlordBand": {
+      "eyebrow": "For landlords",
+      "title": "List for free, get verified.",
+      "body": "Listings with the seal let faster — tenants trust you from the very first message.",
+      "point1": "Free forever — no commission, no hidden fees",
+      "point2": "Verified within 48 hours, support in Vietnamese",
+      "point3": "Serious tenants from the Vietnamese community",
+      "cta": "List your room",
+      "ctaSecondary": "See the verification process",
+      "profileTitle": "YOUR PROFILE",
+      "profileStep1": "Identity documents",
+      "profileStep2": "Right to let",
+      "profileStep3": "Deposit pledge + past-tenancy certificate",
+      "profileHint": "Finish the last step to earn the verification seal on every listing."
+    },
+    "footer": {
+      "tagline": "Verification is free. Listing is free. Forever.",
+      "body": "RentAPlace never holds your money and never processes payments in the app. We verify landlords, require a deposit-protection pledge, and show you how to confirm your own deposit with DPS, mydeposits or TDS.",
+      "cities": "Manchester · London · Birmingham",
+      "email": "hello@rentaplace.uk",
+      "zalo": "Zalo OA: RentAPlace"
+    }
+  },
+  "trust": {
+    "tier1Chip": "Declared: {{scheme}}",
+    "tier2Chip": "Declared: {{scheme}} · certificate ✓",
+    "tier3Chip": "Deposit: tenant-confirmed ✓",
+    "sealTitle": "Verified by RentAPlace",
+    "checkIdentity": "Landlord identity verified",
+    "checkPhotos": "Real photos — taken on site",
+    "checkDepositPledge": "Deposit pledge: {{scheme}} — past-tenancy certificate reviewed",
+    "checkDepositDeclaredOnly": "Deposit pledge: {{scheme}} — certificate not yet submitted",
+    "checkContract": "Contract checked — see the Vietnamese summary",
+    "rightsRow": "Your deposit rights — read before you pay →",
+    "lodgerRow": "Live-in landlord — different deposit rules, see the lodger guide →",
+    "profileCertificate": "Deposit protection certificate ({{scheme}}) — past tenancy, tenant name redacted",
+    "profileBadge": "Protects deposits ✓ · confirmed by {{count}} tenants",
+    "statTenancies": "completed tenancies",
+    "statDepositsReturned": "deposits returned in full",
+    "statDepositsCaption": "as confirmed by past tenants",
+    "statResponseTime": "response time"
+  },
+  "handbook": {
+    "title": "Deposit handbook",
+    "subtitle": "The most valuable thing we give you — knowing the law keeps your money.",
+    "disclaimer": "This is general information, not legal advice. For personal help: Shelter 0808 800 4444 (free) or gov.uk.",
+    "s1": {
+      "title": "Before you pay",
+      "intro": "Don't lose money before you even have keys.",
+      "items": [
+        "Never hand over cash without a receipt — a bank transfer with a clear reference is best.",
+        "The legal maximum deposit = 5 weeks' rent (for rent under £50,000/year). £520/month rent → £600 max deposit.",
+        "Check you're paying the right person: the landlord's name on the contract must match their verified RentAPlace profile.",
+        "Only pay after you've seen the room (in person, or on a live video call from inside the room)."
+      ]
+    },
+    "s2": {
+      "title": "After you pay — the 30-day rule",
+      "intro": "Within 30 days of you paying, the landlord must protect the deposit in a government scheme and send you the paperwork. Demand all of it:",
+      "items": [
+        "① A receipt confirming the deposit amount.",
+        "② The protection certificate, naming the scheme: DPS, mydeposits or TDS.",
+        "③ The 'prescribed information' — a required info pack (address, amount, how you get the deposit back).",
+        "④ Check it yourself, free, on the scheme's website — you just need the deposit ID, or your surname + postcode + tenancy start date."
+      ],
+      "checkerLinks": "Check your deposit: DPS · mydeposits · TDS — free, takes a minute."
+    },
+    "s3": {
+      "title": "Your leverage",
+      "intro": "If 30 days pass and the deposit isn't protected, or you haven't received the paperwork:",
+      "items": [
+        "Step 1 — Send a demand letter (we have templates in Vietnamese + English). Most landlords comply the moment they see you know the law.",
+        "Step 2 — If they still don't: you can claim in the county court for 1 to 3× the deposit (the court decides the multiple). A £600 deposit → a possible £600–£1,800 award, plus the deposit itself.",
+        "A landlord with an unprotected deposit also can't use the standard possession process — one more shield for you.",
+        "You can still claim even after you've moved out."
+      ]
+    },
+    "s4": {
+      "title": "Live-in landlord? (Lodger)",
+      "intro": "If you rent a room in the home the landlord lives in, you're a 'lodger' — deposit protection law does NOT apply. No scheme, no 1–3× penalty. Instead, demand:",
+      "items": [
+        "A written agreement stating the deposit amount and the conditions for returning it.",
+        "A deposit receipt.",
+        "A move-in inventory of the room's condition, with dated photos.",
+        "The deposit must still be returned per the agreement — the inventory + photos are your evidence."
+      ]
+    },
+    "s5": {
+      "title": "Moving out",
+      "intro": "Get the full deposit back:",
+      "items": [
+        "Deductions are only allowed with evidence (damage beyond fair wear and tear, unpaid rent).",
+        "Disagree with a deduction? Use the scheme's own free dispute resolution (DPS/mydeposits/TDS) — no court needed.",
+        "Photograph the room on moving-out day, just like the move-in inventory.",
+        "Review the landlord on RentAPlace — 'returned the deposit in full ✓' helps the next tenant and rewards good landlords."
+      ]
+    }
+  },
+  "contract": {
+    "title": "Contract summary",
+    "subtitle": "Periodic assured tenancy — England's standard since May 2026",
+    "banner": "Explained in plain language. The English original remains the legal document.",
+    "rentLabel": "RENT",
+    "rentBody": "Due on the {{day}} of each month. Includes electricity, water, internet.",
+    "depositLabel": "DEPOSIT",
+    "depositBody": "The landlord pledges {{scheme}}. Within 30 days of paying you must receive: the protection certificate + the prescribed information.",
+    "depositCapNote": "£{{amount}} is the legal maximum for this rent (5 weeks).",
+    "depositPending": "Not yet confirmed — check after move-in",
+    "depositConfirmed": "You confirmed with {{scheme}} · {{date}}",
+    "noticeLabel": "NOTICE",
+    "noticeValue": "2 months",
+    "noticeBody": "To move out, give 2 months' notice in writing.",
+    "termLabel": "TERM",
+    "termValue": "Periodic",
+    "termBody": "No fixed term. No expiry evictions; the landlord needs a legal ground.",
+    "noOddClauses": "No unusual clauses found",
+    "viewOriginal": "View the English original (PDF) →",
+    "disclaimer": "This is general information, not legal advice. The English original is the legal document. Need help: Shelter 0808 800 4444.",
+    "lodgerBanner": "You are a lodger (live-in landlord) — deposit protection law does not apply. See the lodger guide in the Deposit handbook."
+  },
+  "day30": {
+    "day7Title": "Got your deposit receipt yet?",
+    "day7Body": "The receipt is step 1 of the 4 documents you need. Open the handbook for the full list.",
+    "day25Title": "Day 25 of 30 — has your landlord sent the protection certificate?",
+    "day25Received": "Received — confirm",
+    "day25NotYet": "Not yet — see what to do",
+    "confirmPrompt": "Great — check your deposit on the {{scheme}} site (free, 1 minute) and confirm; good landlords deserve the credit.",
+    "confirmButton": "I checked — deposit is protected ✓",
+    "overdueTitle": "Past 30 days — time to use your leverage",
+    "overdueBody": "Open the demand-letter template. Most landlords comply immediately."
+  },
+  "listing": {
+    "availableFrom": "Available from {{date}}",
+    "billsIncluded": "bills included",
+    "messageLandlord": "Message the landlord",
+    "noPayment": "Free · No payments through the app",
+    "viewProfile": "View profile →",
+    "realPhotos": "Real photos · checked {{date}}",
+    "flatmatesVietnamese": "{{count}} Vietnamese flatmates"
+  },
+  "browse": {
+    "title": "Browse",
+    "filterFlatmates": "Vietnamese flatmates",
+    "filterPrice": "Price ≤ £600",
+    "filterNearUni": "Near university"
+  },
+  "landlordProfile": {
+    "title": "Landlord profile",
+    "memberSince": "Landlord in {{city}} · on RentAPlace since {{year}}",
+    "checksTitle": "CHECKS COMPLETED",
+    "checkId": "Identity documents",
+    "checkRightToLet": "Right to let",
+    "reviewsTitle": "WHAT PAST TENANTS SAY"
+  }
+}
