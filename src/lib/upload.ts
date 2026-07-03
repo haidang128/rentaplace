@@ -14,14 +14,17 @@ export async function uploadToBucket(
 ): Promise<string> {
   if (isDemoMode) return uri;
 
+  const MAX_BYTES = 15 * 1024 * 1024; // keep storage costs bounded
   let body: ArrayBuffer | Blob;
   if (process.env.EXPO_OS === "web") {
     body = await (await fetch(uri)).blob();
+    if (body.size > MAX_BYTES) throw new Error("File too large (max 15 MB)");
   } else {
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    if (bytes.length > MAX_BYTES) throw new Error("File too large (max 15 MB)");
     body = bytes.buffer as ArrayBuffer;
   }
 

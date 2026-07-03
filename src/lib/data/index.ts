@@ -294,11 +294,18 @@ export async function uploadListingPhotos(listingId: string, uris: string[]): Pr
     await demoStore.setListingPhotos(listingId, uris);
     return;
   }
+  // Compress before upload: ~300KB instead of 2-4MB per phone photo, a ~10x
+  // saving on both storage and bandwidth (the two Supabase cost drivers).
+  const { ImageManipulator, SaveFormat } = await import("expo-image-manipulator");
   for (let i = 0; i < uris.length; i++) {
+    const context = ImageManipulator.manipulate(uris[i]);
+    context.resize({ width: 1600 });
+    const rendered = await context.renderAsync();
+    const compressed = await rendered.saveAsync({ compress: 0.7, format: SaveFormat.JPEG });
     const path = await uploadToBucket(
       "listing-photos",
       `${listingId}/${Date.now()}-${i}.jpg`,
-      uris[i],
+      compressed.uri,
       "image/jpeg",
     );
     const { error } = await supabase!
