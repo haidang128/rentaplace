@@ -98,6 +98,7 @@
     "tier2Chip": "Declared: {{scheme}} · certificate ✓",
     "tier3Chip": "Deposit: tenant-confirmed ✓",
     "sealTitle": "Verified by RentAPlace",
+    "pendingVerification": "Landlord verification in progress — this listing doesn't carry the seal yet.",
     "checkIdentity": "Landlord identity verified",
     "checkPhotos": "Real photos — taken on site",
     "checkDepositPledge": "Deposit pledge: {{scheme}} — past-tenancy certificate reviewed",

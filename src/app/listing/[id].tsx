@@ -116,12 +116,14 @@ export default function ListingDetailScreen() {
             </Text>
           </Pressable>
 
-          {/* Verification checklist — the seal card */}
+          {/* Verification checklist — the seal card. The seal header only appears
+              when identity + right-to-let are actually approved. */}
           <View
             style={{
               backgroundColor: "#fff",
               borderWidth: 1.5,
-              borderColor: palette.gold,
+              borderColor:
+                landlord?.identityVerified && landlord?.rightToLetVerified ? palette.gold : palette.cardLine,
               borderRadius: radius.card,
               borderCurve: "continuous",
               padding: 18,
@@ -129,12 +131,18 @@ export default function ListingDetailScreen() {
               boxShadow: "0 8px 22px rgba(178,58,46,0.08)",
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
-              <Seal size={26} />
-              <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 15, color: palette.ink }}>
-                {t("trust.sealTitle")}
+            {landlord?.identityVerified && landlord?.rightToLetVerified ? (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+                <Seal size={26} />
+                <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 15, color: palette.ink }}>
+                  {t("trust.sealTitle")}
+                </Text>
+              </View>
+            ) : (
+              <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, lineHeight: 20, color: palette.goldInk }}>
+                {t("trust.pendingVerification")}
               </Text>
-            </View>
+            )}
 
             {landlord?.identityVerified ? <CheckRow label={t("trust.checkIdentity")} /> : null}
             {listing.photosCheckedAt ? <CheckRow label={t("trust.checkPhotos")} /> : null}

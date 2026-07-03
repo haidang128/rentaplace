@@ -98,6 +98,7 @@
     "tier2Chip": "Cam kết: {{scheme}} · chứng chỉ ✓",
     "tier3Chip": "Cọc: người thuê đã xác nhận ✓",
     "sealTitle": "Kiểm chứng bởi RentAPlace",
+    "pendingVerification": "Chủ nhà đang trong quá trình xác minh — tin này chưa có dấu kiểm chứng.",
     "checkIdentity": "Chủ nhà đã xác minh danh tính",
     "checkPhotos": "Ảnh thật — chụp tại chỗ",
     "checkDepositPledge": "Cam kết cọc: {{scheme}} — chứng chỉ từ hợp đồng trước đã kiểm tra",

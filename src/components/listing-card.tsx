@@ -54,27 +54,31 @@ export function ListingCard({
               {t("landing.hero.cardPhotoPlaceholder")}
             </Text>
           )}
-          <View
-            style={{
-              position: "absolute",
-              top: 12,
-              left: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              backgroundColor: "#fff",
-              borderRadius: 999,
-              paddingVertical: 6,
-              paddingLeft: 7,
-              paddingRight: 11,
-              boxShadow: "0 3px 10px rgba(0,0,0,0.14)",
-            }}
-          >
-            <Seal size={16} />
-            <Text style={{ fontFamily: fonts.sansBold, fontSize: 11.5, color: palette.ink }}>
-              {t("common.verified")}
-            </Text>
-          </View>
+          {/* The seal is earned: only when the landlord's identity AND right-to-let
+              are admin-approved. Never decorative. */}
+          {landlord?.identityVerified && landlord?.rightToLetVerified ? (
+            <View
+              style={{
+                position: "absolute",
+                top: 12,
+                left: 12,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor: "#fff",
+                borderRadius: 999,
+                paddingVertical: 6,
+                paddingLeft: 7,
+                paddingRight: 11,
+                boxShadow: "0 3px 10px rgba(0,0,0,0.14)",
+              }}
+            >
+              <Seal size={16} />
+              <Text style={{ fontFamily: fonts.sansBold, fontSize: 11.5, color: palette.ink }}>
+                {t("common.verified")}
+              </Text>
+            </View>
+          ) : null}
           <Pressable
             onPress={(e) => {
               e.stopPropagation();
