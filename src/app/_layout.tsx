@@ -12,6 +12,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { palette } from "@/constants/theme";
+import { AuthProvider } from "@/lib/auth";
 import { LangProvider } from "@/lib/i18n";
 
 SplashScreen.preventAutoHideAsync();
@@ -34,27 +35,31 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
+  const subHeader = {
+    headerShown: true,
+    title: "",
+    headerStyle: { backgroundColor: palette.paper },
+    headerTintColor: palette.ink,
+    headerShadowVisible: false,
+  } as const;
+
   return (
     <LangProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: palette.paper },
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="handbook"
-          options={{
-            headerShown: true,
-            title: "",
-            headerStyle: { backgroundColor: palette.paper },
-            headerTintColor: palette.ink,
-            headerShadowVisible: false,
+      <AuthProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: palette.paper },
           }}
-        />
-      </Stack>
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="handbook" options={subHeader} />
+          <Stack.Screen name="landlord/verification" options={subHeader} />
+          <Stack.Screen name="landlord/new-listing" options={subHeader} />
+          <Stack.Screen name="admin/index" options={subHeader} />
+        </Stack>
+      </AuthProvider>
     </LangProvider>
   );
 }
