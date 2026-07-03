@@ -224,6 +224,14 @@
     "checkRightToLet": "Quyền cho thuê nhà",
     "reviewsTitle": "NGƯỜI THUÊ CŨ NÓI GÌ"
   },
+  "chat": {
+    "empty": "Chưa có cuộc trò chuyện nào. Nhắn tin cho chủ nhà từ trang tin đăng.",
+    "signInFirst": "Đăng nhập ở tab Hồ sơ để nhắn tin.",
+    "inputPlaceholder": "Nhắn tin…",
+    "send": "Gửi",
+    "safetyBanner": "An toàn: luôn xem phòng (trực tiếp hoặc video call) trước khi chuyển bất kỳ khoản tiền nào. Đọc Cẩm nang tiền cọc trước khi đóng cọc.",
+    "about": "Về tin: {{title}}"
+  },
   "savedTab": {
     "empty": "Chưa có phòng nào được lưu. Bấm ♡ trên tin đăng để lưu lại."
   },

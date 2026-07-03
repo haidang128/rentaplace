@@ -224,6 +224,14 @@
     "checkRightToLet": "Right to let",
     "reviewsTitle": "WHAT PAST TENANTS SAY"
   },
+  "chat": {
+    "empty": "No conversations yet. Message a landlord from a listing page.",
+    "signInFirst": "Sign in on the Profile tab to send messages.",
+    "inputPlaceholder": "Message…",
+    "send": "Send",
+    "safetyBanner": "Stay safe: always view the room (in person or on a live video call) before sending any money. Read the Deposit handbook before paying a deposit.",
+    "about": "About: {{title}}"
+  },
   "savedTab": {
     "empty": "No saved rooms yet. Tap ♡ on a listing to save it."
   },

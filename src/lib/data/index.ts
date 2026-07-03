@@ -1,5 +1,11 @@
 import { demoLandlords, demoListings, demoReviews } from "@/lib/data/demo-data";
-import { demoStore, type QueueItem, type VerificationState } from "@/lib/data/demo-store";
+import {
+  demoStore,
+  type ChatMessage,
+  type Conversation,
+  type QueueItem,
+  type VerificationState,
+} from "@/lib/data/demo-store";
 import { isDemoMode, supabase } from "@/lib/supabase";
 import type { DepositScheme, Landlord, Listing, Review, TrustTier } from "@/lib/types";
 
@@ -265,6 +271,116 @@ export async function resolveReview(id: string, resolution: "approved" | "reject
     .update({ status: resolution, resolved_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
+}
+
+// ── M4: chat ─────────────────────────────────────────────────────────────────
+
+export async function getConversations(userId: string): Promise<Conversation[]> {
+  if (isDemoMode) return demoStore.getConversations(userId);
+  const { data, error } = await supabase!
+    .from("conversations")
+    .select(
+      "id, listing_id, renter_id, landlord_id, created_at, listings(title), renter:profiles!conversations_renter_id_fkey(display_name), landlord:profiles!conversations_landlord_id_fkey(display_name)",
+    )
+    .or(`renter_id.eq.${userId},landlord_id.eq.${userId}`)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    listingId: r.listing_id,
+    listingTitle: r.listings?.title ?? "",
+    renterId: r.renter_id,
+    renterName: r.renter?.display_name ?? "",
+    landlordId: r.landlord_id,
+    landlordName: r.landlord?.display_name ?? "",
+    lastMessageAt: r.created_at,
+  }));
+}
+
+export async function getOrCreateConversation(
+  input: Omit<Conversation, "id" | "lastMessageAt">,
+): Promise<Conversation> {
+  if (isDemoMode) return demoStore.getOrCreateConversation(input);
+  const { data: existing } = await supabase!
+    .from("conversations")
+    .select("id, created_at")
+    .eq("listing_id", input.listingId)
+    .eq("renter_id", input.renterId)
+    .maybeSingle();
+  if (existing) return { ...input, id: existing.id, lastMessageAt: existing.created_at };
+  const { data, error } = await supabase!
+    .from("conversations")
+    .insert({ listing_id: input.listingId, renter_id: input.renterId, landlord_id: input.landlordId })
+    .select("id, created_at")
+    .single();
+  if (error) throw error;
+  return { ...input, id: data.id, lastMessageAt: data.created_at };
+}
+
+export async function getMessages(conversationId: string): Promise<ChatMessage[]> {
+  if (isDemoMode) return demoStore.getMessages(conversationId);
+  const { data, error } = await supabase!
+    .from("messages")
+    .select("id, conversation_id, sender_id, body, created_at")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    conversationId: r.conversation_id,
+    senderId: r.sender_id,
+    body: r.body,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function sendMessage(
+  conversationId: string,
+  senderId: string,
+  body: string,
+): Promise<ChatMessage> {
+  if (isDemoMode) return demoStore.sendMessage(conversationId, senderId, body);
+  const { data, error } = await supabase!
+    .from("messages")
+    .insert({ conversation_id: conversationId, sender_id: senderId, body })
+    .select("id, conversation_id, sender_id, body, created_at")
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    conversationId: data.conversation_id,
+    senderId: data.sender_id,
+    body: data.body,
+    createdAt: data.created_at,
+  };
+}
+
+/** Live-mode realtime subscription; no-op unsubscribe in demo mode. */
+export function subscribeToMessages(
+  conversationId: string,
+  onMessage: (message: ChatMessage) => void,
+): () => void {
+  if (isDemoMode) return () => {};
+  const channel = supabase!
+    .channel(`messages-${conversationId}`)
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
+      (payload) => {
+        const r = payload.new as any;
+        onMessage({
+          id: r.id,
+          conversationId: r.conversation_id,
+          senderId: r.sender_id,
+          body: r.body,
+          createdAt: r.created_at,
+        });
+      },
+    )
+    .subscribe();
+  return () => {
+    supabase!.removeChannel(channel);
+  };
 }
 
 export async function joinWaitlist(entry: {

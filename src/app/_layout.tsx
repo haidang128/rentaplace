@@ -60,6 +60,7 @@ export default function RootLayout() {
           <Stack.Screen name="admin/index" options={subHeader} />
           <Stack.Screen name="listing/[id]" options={subHeader} />
           <Stack.Screen name="landlords/[id]" options={subHeader} />
+          <Stack.Screen name="chat/[id]" options={subHeader} />
         </Stack>
       </AuthProvider>
     </LangProvider>

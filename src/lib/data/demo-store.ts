@@ -16,6 +16,25 @@ export type VerificationState = {
   certificateStatus: "none" | "submitted" | "approved" | "rejected";
 };
 
+export type Conversation = {
+  id: string;
+  listingId: string;
+  listingTitle: string;
+  renterId: string;
+  renterName: string;
+  landlordId: string;
+  landlordName: string;
+  lastMessageAt: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  body: string;
+  createdAt: string;
+};
+
 export type QueueItem = {
   id: string;
   type: "identity" | "right_to_let" | "certificate" | "photos" | "contract_summary";
@@ -30,6 +49,8 @@ type DemoState = {
   createdListings: Listing[];
   queue: QueueItem[];
   savedIds: string[];
+  conversations: Conversation[];
+  messages: ChatMessage[];
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -53,6 +74,34 @@ function initialState(): DemoState {
     },
     createdListings: [],
     savedIds: [],
+    conversations: [
+      {
+        id: "c-seed-1",
+        listingId: "10000000-0000-4000-8000-000000000001",
+        listingTitle: "Phòng đôi Fallowfield",
+        renterId: "00000000-0000-4000-8000-000000000003",
+        renterName: "Mai Phạm",
+        landlordId: "00000000-0000-4000-8000-000000000001",
+        landlordName: "Hùng Trần",
+        lastMessageAt: "2026-07-02T09:30:00Z",
+      },
+    ],
+    messages: [
+      {
+        id: "m-seed-1",
+        conversationId: "c-seed-1",
+        senderId: "00000000-0000-4000-8000-000000000003",
+        body: "Chào chú, phòng Fallowfield còn trống không ạ? Cháu muốn xem phòng cuối tuần này.",
+        createdAt: "2026-07-02T09:00:00Z",
+      },
+      {
+        id: "m-seed-2",
+        conversationId: "c-seed-1",
+        senderId: "00000000-0000-4000-8000-000000000001",
+        body: "Chào cháu, còn trống nhé. Thứ 7 10 giờ sáng cháu qua xem được không?",
+        createdAt: "2026-07-02T09:30:00Z",
+      },
+    ],
     queue: [
       {
         id: "q-seed-1",
@@ -150,6 +199,48 @@ export const demoStore = {
       : [...s.savedIds, listingId];
     await save();
     return s.savedIds;
+  },
+
+  async getConversations(userId: string): Promise<Conversation[]> {
+    const s = await load();
+    return s.conversations
+      .filter((c) => c.renterId === userId || c.landlordId === userId)
+      .sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+  },
+
+  async getOrCreateConversation(input: Omit<Conversation, "id" | "lastMessageAt">): Promise<Conversation> {
+    const s = await load();
+    const existing = s.conversations.find(
+      (c) => c.listingId === input.listingId && c.renterId === input.renterId,
+    );
+    if (existing) return existing;
+    const conv: Conversation = { ...input, id: `c-${Date.now()}`, lastMessageAt: new Date().toISOString() };
+    s.conversations.push(conv);
+    await save();
+    return conv;
+  },
+
+  async getMessages(conversationId: string): Promise<ChatMessage[]> {
+    const s = await load();
+    return s.messages
+      .filter((m) => m.conversationId === conversationId)
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  },
+
+  async sendMessage(conversationId: string, senderId: string, body: string): Promise<ChatMessage> {
+    const s = await load();
+    const msg: ChatMessage = {
+      id: `m-${Date.now()}`,
+      conversationId,
+      senderId,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    s.messages.push(msg);
+    const conv = s.conversations.find((c) => c.id === conversationId);
+    if (conv) conv.lastMessageAt = msg.createdAt;
+    await save();
+    return msg;
   },
 
   async getQueue(): Promise<QueueItem[]> {

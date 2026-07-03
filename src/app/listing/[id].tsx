@@ -1,11 +1,12 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
 import { fonts, palette, radius } from "@/constants/theme";
-import { getLandlord, getListing } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
+import { getLandlord, getListing, getOrCreateConversation } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import type { Landlord, Listing } from "@/lib/types";
 
@@ -14,6 +15,7 @@ const schemeLabels = { dps: "DPS", mydeposits: "mydeposits", tds: "TDS" } as con
 export default function ListingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, lang } = useLang();
+  const { session } = useAuth();
   const [listing, setListing] = useState<Listing | null>(null);
   const [landlord, setLandlord] = useState<Landlord | null>(null);
 
@@ -224,7 +226,25 @@ export default function ListingDetailScreen() {
           gap: 8,
         }}
       >
-        <PrimaryButton label={t("listing.messageLandlord")} onPress={() => {}} />
+        <PrimaryButton
+          label={t("listing.messageLandlord")}
+          onPress={async () => {
+            if (!session) {
+              router.push("/(tabs)/profile");
+              return;
+            }
+            if (!landlord) return;
+            const conv = await getOrCreateConversation({
+              listingId: listing.id,
+              listingTitle: listing.title,
+              renterId: session.userId,
+              renterName: session.displayName,
+              landlordId: landlord.id,
+              landlordName: landlord.displayName,
+            });
+            router.push(`/chat/${conv.id}` as any);
+          }}
+        />
         <Text style={{ fontFamily: fonts.sans, fontSize: 11.5, color: palette.inkMuted, textAlign: "center" }}>
           {t("listing.noPayment")}
         </Text>
