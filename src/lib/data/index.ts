@@ -191,7 +191,10 @@ export async function submitVerificationDoc(
     .from("landlord_verifications")
     .upsert({ landlord_id: landlordId, ...column });
   if (error) throw error;
-  await supabase!.from("review_queue").insert({ type: kind, subject_id: landlordId });
+  const { error: queueError } = await supabase!
+    .from("review_queue")
+    .insert({ type: kind, subject_id: landlordId });
+  if (queueError) throw queueError;
 }
 
 export async function declareScheme(landlordId: string, scheme: DepositScheme): Promise<void> {
@@ -242,7 +245,10 @@ export async function createListing(input: NewListingInput, landlordLabel: strin
     .select("id")
     .single();
   if (error) throw error;
-  await supabase!.from("review_queue").insert({ type: "photos", subject_id: data.id });
+  const { error: queueError } = await supabase!
+    .from("review_queue")
+    .insert({ type: "photos", subject_id: data.id });
+  if (queueError) throw queueError;
 }
 
 export async function getMyListings(landlordId: string): Promise<Listing[]> {
@@ -285,11 +291,37 @@ export async function getReviewQueue(): Promise<QueueItem[]> {
     .select("id, type, subject_id, status, created_at")
     .order("created_at", { ascending: true });
   if (error) throw error;
+
+  // Resolve human-readable labels: listing titles for photos, landlord names for
+  // verification docs, listing titles (via summary) for contracts.
+  const listingIds = data.filter((r: any) => r.type === "photos").map((r: any) => r.subject_id);
+  const profileIds = data
+    .filter((r: any) => ["identity", "right_to_let", "certificate"].includes(r.type))
+    .map((r: any) => r.subject_id);
+  const summaryIds = data.filter((r: any) => r.type === "contract_summary").map((r: any) => r.subject_id);
+
+  const labels = new Map<string, string>();
+  if (listingIds.length > 0) {
+    const { data: rows } = await supabase!.from("listings").select("id, title").in("id", listingIds);
+    rows?.forEach((row: any) => labels.set(row.id, row.title));
+  }
+  if (profileIds.length > 0) {
+    const { data: rows } = await supabase!.from("profiles").select("id, display_name").in("id", profileIds);
+    rows?.forEach((row: any) => labels.set(row.id, row.display_name));
+  }
+  if (summaryIds.length > 0) {
+    const { data: rows } = await supabase!
+      .from("contract_summaries")
+      .select("id, listings(title)")
+      .in("id", summaryIds);
+    rows?.forEach((row: any) => labels.set(row.id, row.listings?.title ?? row.id));
+  }
+
   return data.map((r: any) => ({
     id: r.id,
     type: r.type,
     subjectId: r.subject_id,
-    subjectLabel: r.subject_id,
+    subjectLabel: labels.get(r.subject_id) ?? r.subject_id,
     status: r.status === "open" ? "open" : r.status,
     createdAt: r.created_at,
   }));
@@ -439,7 +471,10 @@ export async function submitContract(
     .select("id")
     .single();
   if (error) throw error;
-  await supabase!.from("review_queue").insert({ type: "contract_summary", subject_id: data.id });
+  const { error: queueError } = await supabase!
+    .from("review_queue")
+    .insert({ type: "contract_summary", subject_id: data.id });
+  if (queueError) throw queueError;
   // AI pre-fill is optional: if the Edge Function isn't deployed (no Anthropic key),
   // the admin fills the summary manually in the review form.
   try {
