@@ -1,4 +1,4 @@
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 
 import { useLang } from "@/lib/i18n";
 
@@ -8,20 +8,20 @@ export default function TabsLayout() {
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="browse">
-        <NativeTabs.Trigger.Icon sf="magnifyingglass" />
-        <NativeTabs.Trigger.Label>{t("tabs.browse")}</NativeTabs.Trigger.Label>
+        <Icon sf="magnifyingglass" />
+        <Label>{t("tabs.browse")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="saved">
-        <NativeTabs.Trigger.Icon sf="heart" />
-        <NativeTabs.Trigger.Label>{t("tabs.saved")}</NativeTabs.Trigger.Label>
+        <Icon sf="heart" />
+        <Label>{t("tabs.saved")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="messages">
-        <NativeTabs.Trigger.Icon sf="message" />
-        <NativeTabs.Trigger.Label>{t("tabs.messages")}</NativeTabs.Trigger.Label>
+        <Icon sf="message" />
+        <Label>{t("tabs.messages")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf="person.crop.circle" />
-        <NativeTabs.Trigger.Label>{t("tabs.profile")}</NativeTabs.Trigger.Label>
+        <Icon sf="person.crop.circle" />
+        <Label>{t("tabs.profile")}</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
