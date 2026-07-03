@@ -237,7 +237,9 @@ export default function ListingDetailScreen() {
                     <Text style={{ fontFamily: fonts.sansBold, fontSize: 14.5, color: palette.ink }}>
                       {landlord.nickname ?? landlord.displayName}
                     </Text>
-                    {landlord.identityVerified ? <Seal size={15} accent={null} /> : null}
+                    {landlord.identityVerified && landlord.rightToLetVerified ? (
+                      <Seal size={15} accent={null} />
+                    ) : null}
                   </View>
                   <Text style={{ fontFamily: fonts.sans, fontSize: 12, color: palette.inkMuted }}>
                     {landlord.stats.completedTenancies} {t("trust.statTenancies")}

@@ -50,7 +50,7 @@ export default function LandlordProfileScreen() {
               {landlord.displayName.charAt(0)}
             </Text>
           </View>
-          {landlord.identityVerified ? (
+          {landlord.identityVerified && landlord.rightToLetVerified ? (
             <View style={{ position: "absolute", right: -6, bottom: -2 }}>
               <Seal size={28} />
             </View>
