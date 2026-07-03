@@ -219,6 +219,25 @@ export async function getMyListings(landlordId: string): Promise<Listing[]> {
   return data.map(mapListing);
 }
 
+export async function getSavedIds(userId: string | null): Promise<string[]> {
+  if (isDemoMode || !userId) return demoStore.getSavedIds();
+  const { data, error } = await supabase!.from("saved_listings").select("listing_id").eq("profile_id", userId);
+  if (error) throw error;
+  return data.map((r: any) => r.listing_id);
+}
+
+export async function toggleSaved(userId: string | null, listingId: string, saved: boolean): Promise<void> {
+  if (isDemoMode || !userId) {
+    await demoStore.toggleSaved(listingId);
+    return;
+  }
+  if (saved) {
+    await supabase!.from("saved_listings").delete().eq("profile_id", userId).eq("listing_id", listingId);
+  } else {
+    await supabase!.from("saved_listings").insert({ profile_id: userId, listing_id: listingId });
+  }
+}
+
 export async function getReviewQueue(): Promise<QueueItem[]> {
   if (isDemoMode) return demoStore.getQueue();
   const { data, error } = await supabase!

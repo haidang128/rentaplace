@@ -224,6 +224,9 @@
     "checkRightToLet": "Right to let",
     "reviewsTitle": "WHAT PAST TENANTS SAY"
   },
+  "savedTab": {
+    "empty": "No saved rooms yet. Tap ♡ on a listing to save it."
+  },
   "auth": {
     "signInTitle": "Sign in",
     "signInBody": "Enter your email — we send a 6-digit code, no password needed.",

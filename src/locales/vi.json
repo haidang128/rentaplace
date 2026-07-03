@@ -224,6 +224,9 @@
     "checkRightToLet": "Quyền cho thuê nhà",
     "reviewsTitle": "NGƯỜI THUÊ CŨ NÓI GÌ"
   },
+  "savedTab": {
+    "empty": "Chưa có phòng nào được lưu. Bấm ♡ trên tin đăng để lưu lại."
+  },
   "auth": {
     "signInTitle": "Đăng nhập",
     "signInBody": "Nhập email — chúng tôi gửi mã 6 số, không cần mật khẩu.",

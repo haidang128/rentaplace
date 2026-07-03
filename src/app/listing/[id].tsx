@@ -1,0 +1,262 @@
+import { Link, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+
+import { PrimaryButton } from "@/components/form";
+import { Seal } from "@/components/seal";
+import { fonts, palette, radius } from "@/constants/theme";
+import { getLandlord, getListing } from "@/lib/data";
+import { useLang } from "@/lib/i18n";
+import type { Landlord, Listing } from "@/lib/types";
+
+const schemeLabels = { dps: "DPS", mydeposits: "mydeposits", tds: "TDS" } as const;
+
+export default function ListingDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t, lang } = useLang();
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [landlord, setLandlord] = useState<Landlord | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    getListing(id).then(async (l) => {
+      setListing(l);
+      if (l) setLandlord(await getLandlord(l.landlordId));
+    });
+  }, [id]);
+
+  if (!listing) return null;
+
+  const scheme = landlord?.depositSchemeDeclared ? schemeLabels[landlord.depositSchemeDeclared] : null;
+  const availableDate = listing.availableFrom
+    ? new Date(listing.availableFrom).toLocaleDateString(lang === "vi" ? "vi-VN" : "en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+      })
+    : null;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: palette.paper }}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 16 }}>
+        {/* photos */}
+        <View style={{ height: 236, backgroundColor: palette.paperDeep, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ fontSize: 10, color: palette.inkFaint }}>{t("landing.hero.cardPhotoPlaceholder")}</Text>
+          {listing.photosCheckedAt ? (
+            <View
+              style={{
+                position: "absolute",
+                bottom: 12,
+                left: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor: "rgba(44,32,26,0.85)",
+                borderRadius: 999,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+              }}
+            >
+              <Text style={{ fontFamily: fonts.sansBold, fontSize: 11.5, color: "#fff" }}>
+                {t("listing.realPhotos", {
+                  date: new Date(listing.photosCheckedAt).toLocaleDateString(lang === "vi" ? "vi-VN" : "en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                  }),
+                })}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
+        <View style={{ padding: 20, gap: 12, maxWidth: 640, width: "100%", alignSelf: "center" }}>
+          <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
+            <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 26, color: palette.ink }}>
+              £{listing.pricePcm}
+              <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.inkMuted }}>
+                /{t("common.perMonth")}
+              </Text>
+            </Text>
+            {availableDate ? (
+              <Text style={{ fontFamily: fonts.sansBold, fontSize: 12.5, color: palette.green }}>
+                {t("listing.availableFrom", { date: availableDate })}
+              </Text>
+            ) : null}
+          </View>
+          <Text style={{ fontFamily: fonts.sans, fontSize: 14.5, color: palette.inkSoft }}>
+            {listing.title} · {listing.area}, {listing.city}
+            {listing.billsIncluded ? ` · ${t("listing.billsIncluded")}` : ""}
+          </Text>
+
+          {/* Verification checklist — the seal card */}
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderWidth: 1.5,
+              borderColor: palette.gold,
+              borderRadius: radius.card,
+              borderCurve: "continuous",
+              padding: 18,
+              gap: 10,
+              boxShadow: "0 8px 22px rgba(178,58,46,0.08)",
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+              <Seal size={26} />
+              <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 15, color: palette.ink }}>
+                {t("trust.sealTitle")}
+              </Text>
+            </View>
+
+            {landlord?.identityVerified ? <CheckRow label={t("trust.checkIdentity")} /> : null}
+            {listing.photosCheckedAt ? <CheckRow label={t("trust.checkPhotos")} /> : null}
+
+            {listing.liveInLandlord ? (
+              <Link href="/handbook" asChild>
+                <Pressable>
+                  <View
+                    style={{
+                      backgroundColor: palette.goldWash,
+                      borderRadius: radius.field,
+                      borderCurve: "continuous",
+                      padding: 12,
+                    }}
+                  >
+                    <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, lineHeight: 20, color: palette.goldInk }}>
+                      {t("trust.lodgerRow")}
+                    </Text>
+                  </View>
+                </Pressable>
+              </Link>
+            ) : scheme ? (
+              <CheckRow
+                label={
+                  landlord?.certificateReviewed
+                    ? t("trust.checkDepositPledge", { scheme })
+                    : t("trust.checkDepositDeclaredOnly", { scheme })
+                }
+                tone={landlord?.certificateReviewed ? "check" : "pending"}
+              />
+            ) : null}
+
+            {/* Education row — read before you pay */}
+            {!listing.liveInLandlord ? (
+              <Link href="/handbook" asChild>
+                <Pressable>
+                  <Text
+                    style={{
+                      fontFamily: fonts.sansBold,
+                      fontSize: 13.5,
+                      color: palette.brick,
+                      textDecorationLine: "underline",
+                    }}
+                  >
+                    {t("trust.rightsRow")}
+                  </Text>
+                </Pressable>
+              </Link>
+            ) : null}
+          </View>
+
+          {/* landlord row */}
+          {landlord ? (
+            <Link href={`/landlords/${landlord.id}` as any} asChild>
+              <Pressable
+                style={{
+                  backgroundColor: "#fff",
+                  borderWidth: 1,
+                  borderColor: palette.cardLine,
+                  borderRadius: radius.card,
+                  borderCurve: "continuous",
+                  padding: 14,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 999,
+                    backgroundColor: palette.goldWash,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 17, color: palette.goldInk }}>
+                    {landlord.displayName.charAt(0)}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <Text style={{ fontFamily: fonts.sansBold, fontSize: 14.5, color: palette.ink }}>
+                      {landlord.nickname ?? landlord.displayName}
+                    </Text>
+                    {landlord.identityVerified ? <Seal size={15} accent={null} /> : null}
+                  </View>
+                  <Text style={{ fontFamily: fonts.sans, fontSize: 12, color: palette.inkMuted }}>
+                    {landlord.stats.completedTenancies} {t("trust.statTenancies")}
+                  </Text>
+                </View>
+                <Text style={{ fontFamily: fonts.sansBold, fontSize: 12.5, color: palette.brick }}>
+                  {t("listing.viewProfile")}
+                </Text>
+              </Pressable>
+            </Link>
+          ) : null}
+
+          {listing.description ? (
+            <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 23, color: palette.inkSoft }}>
+              {listing.description}
+            </Text>
+          ) : null}
+        </View>
+      </ScrollView>
+
+      {/* CTA */}
+      <View
+        style={{
+          padding: 20,
+          paddingBottom: 28,
+          backgroundColor: palette.cream,
+          borderTopWidth: 1,
+          borderTopColor: palette.line,
+          gap: 8,
+        }}
+      >
+        <PrimaryButton label={t("listing.messageLandlord")} onPress={() => {}} />
+        <Text style={{ fontFamily: fonts.sans, fontSize: 11.5, color: palette.inkMuted, textAlign: "center" }}>
+          {t("listing.noPayment")}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function CheckRow({ label, tone = "check" }: { label: string; tone?: "check" | "pending" }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+      <View
+        style={{
+          width: 21,
+          height: 21,
+          borderRadius: 999,
+          backgroundColor: tone === "check" ? palette.greenWash : palette.goldWash,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: fonts.sansExtraBold,
+            fontSize: 11,
+            color: tone === "check" ? palette.green : palette.goldInk,
+          }}
+        >
+          {tone === "check" ? "✓" : "…"}
+        </Text>
+      </View>
+      <Text style={{ flex: 1, fontFamily: fonts.sansMedium, fontSize: 13.5, color: palette.ink }}>{label}</Text>
+    </View>
+  );
+}

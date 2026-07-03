@@ -1,123 +1,120 @@
-import { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { FlatList, Pressable, Text, View } from "react-native";
 
-import { Seal } from "@/components/seal";
-import { TrustChip } from "@/components/trust-chip";
-import { fonts, palette, radius } from "@/constants/theme";
-import { getLandlord, getLiveListings } from "@/lib/data";
+import { ListingCard } from "@/components/listing-card";
+import { fonts, palette } from "@/constants/theme";
+import { useAuth } from "@/lib/auth";
+import { getLandlord, getLiveListings, getSavedIds, toggleSaved } from "@/lib/data";
 import { useLang } from "@/lib/i18n";
 import type { Landlord, Listing } from "@/lib/types";
 
+type Filter = "flatmates" | "price" | "nearUni";
+
 export default function BrowseScreen() {
   const { t } = useLang();
+  const { session } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [landlords, setLandlords] = useState<Record<string, Landlord>>({});
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [filters, setFilters] = useState<Set<Filter>>(new Set());
 
-  useEffect(() => {
-    getLiveListings().then(async (rows) => {
-      setListings(rows);
-      const ids = [...new Set(rows.map((l) => l.landlordId))];
-      const loaded = await Promise.all(ids.map(getLandlord));
-      setLandlords(Object.fromEntries(loaded.filter(Boolean).map((l) => [l!.id, l!])));
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      Promise.all([getLiveListings(), getSavedIds(session?.userId ?? null)]).then(async ([rows, saved]) => {
+        if (!alive) return;
+        setListings(rows);
+        setSavedIds(saved);
+        const ids = [...new Set(rows.map((l) => l.landlordId))];
+        const loaded = await Promise.all(ids.map(getLandlord));
+        if (alive) setLandlords(Object.fromEntries(loaded.filter(Boolean).map((l) => [l!.id, l!])));
+      });
+      return () => {
+        alive = false;
+      };
+    }, [session?.userId]),
+  );
+
+  const toggleFilter = (f: Filter) => {
+    setFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(f)) next.delete(f);
+      else next.add(f);
+      return next;
     });
-  }, []);
+  };
+
+  const visible = listings.filter((l) => {
+    if (filters.has("flatmates") && l.vietnameseFlatmates === 0) return false;
+    if (filters.has("price") && l.pricePcm > 600) return false;
+    if (filters.has("nearUni") && !l.nearUniversity) return false;
+    return true;
+  });
+
+  const onToggleSaved = async (listing: Listing) => {
+    const isSaved = savedIds.includes(listing.id);
+    setSavedIds((prev) => (isSaved ? prev.filter((id) => id !== listing.id) : [...prev, listing.id]));
+    await toggleSaved(session?.userId ?? null, listing.id, isSaved);
+  };
+
+  const filterChips: { key: Filter; label: string }[] = [
+    { key: "flatmates", label: t("browse.filterFlatmates") },
+    { key: "price", label: t("browse.filterPrice") },
+    { key: "nearUni", label: t("browse.filterNearUni") },
+  ];
 
   return (
     <FlatList
       contentInsetAdjustmentBehavior="automatic"
       style={{ flex: 1, backgroundColor: palette.paper }}
-      contentContainerStyle={{ padding: 20, gap: 14 }}
-      data={listings}
+      contentContainerStyle={{ padding: 20, gap: 14, maxWidth: 720, width: "100%", alignSelf: "center" }}
+      data={visible}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={
-        <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 26, color: palette.ink, paddingBottom: 6 }}>
-          {t("browse.title")}
-        </Text>
-      }
-      renderItem={({ item }) => {
-        const landlord = landlords[item.landlordId];
-        return (
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderWidth: 1,
-              borderColor: palette.cardLine,
-              borderRadius: radius.card,
-              borderCurve: "continuous",
-              overflow: "hidden",
-              boxShadow: "0 4px 14px rgba(60,40,20,0.06)",
-            }}
-          >
-            <View
-              style={{
-                height: 150,
-                backgroundColor: palette.paperDeep,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontSize: 10, color: palette.inkFaint }}>
-                {t("landing.hero.cardPhotoPlaceholder")}
-              </Text>
-              <View
-                style={{
-                  position: "absolute",
-                  top: 12,
-                  left: 12,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  backgroundColor: "#fff",
-                  borderRadius: 999,
-                  paddingVertical: 6,
-                  paddingLeft: 7,
-                  paddingRight: 11,
-                  boxShadow: "0 3px 10px rgba(0,0,0,0.14)",
-                }}
-              >
-                <Seal size={16} />
-                <Text style={{ fontFamily: fonts.sansBold, fontSize: 11.5, color: palette.ink }}>
-                  {t("common.verified")}
-                </Text>
-              </View>
-            </View>
-            <View style={{ padding: 16, gap: 8 }}>
-              <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-                <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 20, color: palette.ink }}>
-                  £{item.pricePcm}
-                  <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkMuted }}>
-                    /{t("common.perMonth")}
-                  </Text>
-                </Text>
-                {item.vietnameseFlatmates > 0 ? (
-                  <View
+        <View style={{ gap: 12, paddingBottom: 6 }}>
+          <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 26, color: palette.ink }}>
+            {t("browse.title")}
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            {filterChips.map(({ key, label }) => {
+              const active = filters.has(key);
+              return (
+                <Pressable
+                  key={key}
+                  onPress={() => toggleFilter(key)}
+                  style={{
+                    paddingHorizontal: 14,
+                    paddingVertical: 9,
+                    borderRadius: 999,
+                    borderWidth: 1.5,
+                    borderColor: active ? palette.brick : palette.lineStrong,
+                    backgroundColor: active ? palette.brick : "#fff",
+                  }}
+                >
+                  <Text
                     style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      borderRadius: 999,
-                      backgroundColor: palette.goldWash,
+                      fontFamily: fonts.sansBold,
+                      fontSize: 13,
+                      color: active ? "#fff" : palette.inkSoft,
                     }}
                   >
-                    <Text style={{ fontFamily: fonts.sansBold, fontSize: 11.5, color: palette.goldInk }}>
-                      {t("listing.flatmatesVietnamese", { count: item.vietnameseFlatmates })}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text style={{ fontFamily: fonts.sans, fontSize: 13.5, color: palette.inkSoft }}>
-                {item.title} · {item.area}
-              </Text>
-              {item.liveInLandlord ? (
-                <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 12.5, color: palette.goldInk }}>
-                  {t("trust.lodgerRow")}
-                </Text>
-              ) : landlord ? (
-                <TrustChip tier={landlord.trustTier} scheme={landlord.depositSchemeDeclared} size="sm" />
-              ) : null}
-            </View>
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
-        );
-      }}
+        </View>
+      }
+      renderItem={({ item }) => (
+        <ListingCard
+          listing={item}
+          landlord={landlords[item.landlordId]}
+          saved={savedIds.includes(item.id)}
+          onToggleSaved={() => onToggleSaved(item)}
+        />
+      )}
     />
   );
 }

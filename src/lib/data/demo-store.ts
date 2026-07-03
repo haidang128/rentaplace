@@ -29,6 +29,7 @@ type DemoState = {
   verifications: Record<string, VerificationState>;
   createdListings: Listing[];
   queue: QueueItem[];
+  savedIds: string[];
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -51,6 +52,7 @@ function initialState(): DemoState {
       },
     },
     createdListings: [],
+    savedIds: [],
     queue: [
       {
         id: "q-seed-1",
@@ -134,6 +136,20 @@ export const demoStore = {
   async getCreatedListings(landlordId?: string): Promise<Listing[]> {
     const s = await load();
     return landlordId ? s.createdListings.filter((l) => l.landlordId === landlordId) : s.createdListings;
+  },
+
+  async getSavedIds(): Promise<string[]> {
+    const s = await load();
+    return s.savedIds;
+  },
+
+  async toggleSaved(listingId: string): Promise<string[]> {
+    const s = await load();
+    s.savedIds = s.savedIds.includes(listingId)
+      ? s.savedIds.filter((id) => id !== listingId)
+      : [...s.savedIds, listingId];
+    await save();
+    return s.savedIds;
   },
 
   async getQueue(): Promise<QueueItem[]> {
