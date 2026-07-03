@@ -35,6 +35,21 @@ export type ChatMessage = {
   createdAt: string;
 };
 
+export type Tenancy = {
+  id: string;
+  listingId: string;
+  listingTitle: string;
+  landlordId: string;
+  renterId: string;
+  moveInDate: string; // YYYY-MM-DD
+  depositAmount: number;
+  scheme: DepositScheme | null;
+  isLodger: boolean;
+  status: "active" | "ended";
+  confirmedAt: string | null;
+  reviewed: boolean;
+};
+
 export type QueueItem = {
   id: string;
   type: "identity" | "right_to_let" | "certificate" | "photos" | "contract_summary";
@@ -51,6 +66,8 @@ type DemoState = {
   savedIds: string[];
   conversations: Conversation[];
   messages: ChatMessage[];
+  tenancies: Tenancy[];
+  extraReviews: { landlordId: string; stars: number; body: string; depositReturnedInFull: boolean }[];
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -74,6 +91,8 @@ function initialState(): DemoState {
     },
     createdListings: [],
     savedIds: [],
+    tenancies: [],
+    extraReviews: [],
     conversations: [
       {
         id: "c-seed-1",
@@ -241,6 +260,53 @@ export const demoStore = {
     if (conv) conv.lastMessageAt = msg.createdAt;
     await save();
     return msg;
+  },
+
+  async getTenancies(renterId: string): Promise<Tenancy[]> {
+    const s = await load();
+    return s.tenancies.filter((t) => t.renterId === renterId);
+  },
+
+  async createTenancy(input: Omit<Tenancy, "id" | "status" | "confirmedAt" | "reviewed">): Promise<Tenancy> {
+    const s = await load();
+    const tenancy: Tenancy = { ...input, id: `t-${Date.now()}`, status: "active", confirmedAt: null, reviewed: false };
+    s.tenancies.push(tenancy);
+    await save();
+    return tenancy;
+  },
+
+  async confirmDeposit(tenancyId: string): Promise<void> {
+    const s = await load();
+    const tenancy = s.tenancies.find((t) => t.id === tenancyId);
+    if (tenancy) tenancy.confirmedAt = new Date().toISOString();
+    await save();
+  },
+
+  async endTenancyWithReview(
+    tenancyId: string,
+    review: { stars: number; body: string; depositReturnedInFull: boolean },
+  ): Promise<void> {
+    const s = await load();
+    const tenancy = s.tenancies.find((t) => t.id === tenancyId);
+    if (!tenancy) return;
+    tenancy.status = "ended";
+    tenancy.reviewed = true;
+    s.extraReviews.push({ landlordId: tenancy.landlordId, ...review });
+    await save();
+  },
+
+  /** Flywheel overlay for demo landlords: confirmations + extra reviews. */
+  async getLandlordOverlay(landlordId: string): Promise<{
+    confirmations: number;
+    verification: VerificationState;
+    extraReviews: { stars: number; body: string; depositReturnedInFull: boolean }[];
+  }> {
+    const s = await load();
+    return {
+      confirmations: s.tenancies.filter((t) => t.landlordId === landlordId && t.confirmedAt).length,
+      verification: await this.getVerification(landlordId),
+      extraReviews: s.extraReviews.filter((r) => r.landlordId === landlordId),
+    };
   },
 
   async getQueue(): Promise<QueueItem[]> {

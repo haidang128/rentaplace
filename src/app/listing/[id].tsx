@@ -212,6 +212,16 @@ export default function ListingDetailScreen() {
               {listing.description}
             </Text>
           ) : null}
+
+          {session ? (
+            <Link href={`/tenancy/new?listingId=${listing.id}` as any} asChild>
+              <Pressable style={{ paddingVertical: 4 }}>
+                <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.brick }}>
+                  {t("tenancy.recordLink")}
+                </Text>
+              </Pressable>
+            </Link>
+          ) : null}
         </View>
       </ScrollView>
 

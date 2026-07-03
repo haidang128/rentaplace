@@ -56,6 +56,7 @@ export default function ProfileScreen() {
             </>
           ) : null}
           {session.role === "admin" ? <MenuLink href="/admin" label={t("admin.title")} /> : null}
+          {session.role === "renter" ? <MenuLink href="/tenancy" label={t("tenancy.menuLink")} /> : null}
           <MenuLink href="/handbook" label={t("handbook.title")} />
 
           <Pressable onPress={signOut} style={{ paddingVertical: 10 }}>

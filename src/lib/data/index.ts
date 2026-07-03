@@ -4,6 +4,7 @@ import {
   type ChatMessage,
   type Conversation,
   type QueueItem,
+  type Tenancy,
   type VerificationState,
 } from "@/lib/data/demo-store";
 import { isDemoMode, supabase } from "@/lib/supabase";
@@ -64,7 +65,28 @@ export async function getListing(id: string): Promise<Listing | null> {
 }
 
 export async function getLandlord(id: string): Promise<Landlord | null> {
-  if (isDemoMode) return demoLandlords.find((l) => l.id === id) ?? null;
+  if (isDemoMode) {
+    const base = demoLandlords.find((l) => l.id === id);
+    if (!base) return null;
+    // Overlay live demo state so the trust ladder reacts to user actions.
+    const overlay = await demoStore.getLandlordOverlay(id);
+    const confirmations = base.stats.depositConfirmations + overlay.confirmations;
+    const tier: TrustTier =
+      confirmations > 0
+        ? 3
+        : overlay.verification.certificateStatus === "approved"
+          ? 2
+          : overlay.verification.schemeDeclared
+            ? 1
+            : 0;
+    return {
+      ...base,
+      depositSchemeDeclared: overlay.verification.schemeDeclared,
+      certificateReviewed: overlay.verification.certificateStatus === "approved",
+      trustTier: tier,
+      stats: { ...base.stats, depositConfirmations: confirmations },
+    };
+  }
 
   const [profileRes, publicRes, tierRes, statsRes] = await Promise.all([
     supabase!.from("profiles").select("id, display_name, city, created_at").eq("id", id).maybeSingle(),
@@ -97,7 +119,17 @@ export async function getLandlord(id: string): Promise<Landlord | null> {
 }
 
 export async function getLandlordReviews(landlordId: string): Promise<Review[]> {
-  if (isDemoMode) return demoReviews[landlordId] ?? [];
+  if (isDemoMode) {
+    const overlay = await demoStore.getLandlordOverlay(landlordId);
+    const extra: Review[] = overlay.extraReviews.map((r, i) => ({
+      id: `extra-${i}`,
+      stars: r.stars,
+      body: r.body,
+      depositReturnedInFull: r.depositReturnedInFull,
+      reviewerLabel: "",
+    }));
+    return [...extra, ...(demoReviews[landlordId] ?? [])];
+  }
   const { data, error } = await supabase!
     .from("reviews")
     .select("id, stars, body, deposit_returned_in_full, tenancies!inner(listing_id, listings!inner(landlord_id))")
@@ -270,6 +302,79 @@ export async function resolveReview(id: string, resolution: "approved" | "reject
     .from("review_queue")
     .update({ status: resolution, resolved_at: new Date().toISOString() })
     .eq("id", id);
+  if (error) throw error;
+}
+
+// ── M5: tenancies, day-30 loop, reviews ──────────────────────────────────────
+
+export async function getMyTenancies(renterId: string): Promise<Tenancy[]> {
+  if (isDemoMode) return demoStore.getTenancies(renterId);
+  const { data, error } = await supabase!
+    .from("tenancies")
+    .select("*, listings(title, landlord_id), deposit_confirmations(confirmed_at), reviews(id)")
+    .eq("renter_id", renterId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    listingId: r.listing_id,
+    listingTitle: r.listings?.title ?? "",
+    landlordId: r.listings?.landlord_id ?? "",
+    renterId: r.renter_id,
+    moveInDate: r.move_in_date,
+    depositAmount: r.deposit_amount,
+    scheme: r.scheme,
+    isLodger: r.is_lodger,
+    status: r.status,
+    confirmedAt: r.deposit_confirmations?.confirmed_at ?? null,
+    reviewed: (r.reviews ?? []).length > 0,
+  }));
+}
+
+export async function createTenancy(
+  input: Omit<Tenancy, "id" | "status" | "confirmedAt" | "reviewed">,
+): Promise<Tenancy> {
+  if (isDemoMode) return demoStore.createTenancy(input);
+  const { data, error } = await supabase!
+    .from("tenancies")
+    .insert({
+      listing_id: input.listingId,
+      renter_id: input.renterId,
+      move_in_date: input.moveInDate,
+      deposit_amount: input.depositAmount,
+      scheme: input.scheme,
+      is_lodger: input.isLodger,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return { ...input, id: data.id, status: "active", confirmedAt: null, reviewed: false };
+}
+
+export async function confirmDeposit(tenancyId: string, scheme: DepositScheme): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.confirmDeposit(tenancyId);
+    return;
+  }
+  const { error } = await supabase!.from("deposit_confirmations").insert({ tenancy_id: tenancyId, scheme });
+  if (error) throw error;
+}
+
+export async function endTenancyWithReview(
+  tenancyId: string,
+  review: { stars: number; body: string; depositReturnedInFull: boolean },
+): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.endTenancyWithReview(tenancyId, review);
+    return;
+  }
+  await supabase!.from("tenancies").update({ status: "ended" }).eq("id", tenancyId);
+  const { error } = await supabase!.from("reviews").insert({
+    tenancy_id: tenancyId,
+    stars: review.stars,
+    body: review.body,
+    deposit_returned_in_full: review.depositReturnedInFull,
+  });
   if (error) throw error;
 }
 
