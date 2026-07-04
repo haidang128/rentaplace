@@ -289,7 +289,7 @@ export async function createListing(input: NewListingInput, landlordLabel: strin
 }
 
 /** Upload listing photos (picked local uris) and attach them to the listing. */
-export async function uploadListingPhotos(listingId: string, uris: string[]): Promise<void> {
+export async function uploadListingPhotos(listingId: string, uris: string[], startOrder = 0): Promise<void> {
   if (isDemoMode) {
     await demoStore.setListingPhotos(listingId, uris);
     return;
@@ -310,9 +310,67 @@ export async function uploadListingPhotos(listingId: string, uris: string[]): Pr
     );
     const { error } = await supabase!
       .from("listing_photos")
-      .insert({ listing_id: listingId, path, sort_order: i });
+      .insert({ listing_id: listingId, path, sort_order: startOrder + i });
     if (error) throw error;
   }
+}
+
+export type ListingPhoto = { id: string; path: string; url: string; sortOrder: number };
+
+export async function getListingPhotos(listingId: string): Promise<ListingPhoto[]> {
+  if (isDemoMode) {
+    const created = await demoStore.getCreatedListings();
+    const listing = created.find((l) => l.id === listingId) ?? demoListings.find((l) => l.id === listingId);
+    return (listing?.photoUrls ?? []).map((url, i) => ({ id: url, path: url, url, sortOrder: i }));
+  }
+  const { data, error } = await supabase!
+    .from("listing_photos")
+    .select("id, path, sort_order")
+    .eq("listing_id", listingId)
+    .order("sort_order");
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    path: r.path,
+    url: publicPhotoUrl(r.path),
+    sortOrder: r.sort_order,
+  }));
+}
+
+/** Append photos to an existing listing. Live listings get a fresh photos-review item. */
+export async function addListingPhotos(listing: Listing, uris: string[]): Promise<void> {
+  if (isDemoMode) {
+    const existing = await getListingPhotos(listing.id);
+    await demoStore.setListingPhotos(listing.id, [...existing.map((p) => p.url), ...uris]);
+    return;
+  }
+  const existing = await getListingPhotos(listing.id);
+  const startOrder = existing.length ? Math.max(...existing.map((p) => p.sortOrder)) + 1 : 0;
+  await uploadListingPhotos(listing.id, uris, startOrder);
+  if (listing.status === "live") {
+    const { error } = await supabase!
+      .from("review_queue")
+      .insert({ type: "photos", subject_id: listing.id });
+    if (error) throw error;
+  }
+}
+
+export async function removeListingPhoto(listing: Listing, photo: ListingPhoto): Promise<void> {
+  if (isDemoMode) {
+    const existing = await getListingPhotos(listing.id);
+    await demoStore.setListingPhotos(
+      listing.id,
+      existing.filter((p) => p.id !== photo.id).map((p) => p.url),
+    );
+    return;
+  }
+  const { error } = await supabase!.from("listing_photos").delete().eq("id", photo.id);
+  if (error) throw error;
+  // Also free the blob (needs the owner-delete storage policy from migration 5;
+  // best-effort — the photo is already gone from the listing either way).
+  try {
+    await supabase!.storage.from("listing-photos").remove([photo.path]);
+  } catch {}
 }
 
 export async function getMyListings(landlordId: string): Promise<Listing[]> {

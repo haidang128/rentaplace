@@ -348,6 +348,8 @@
     "photosLabel": "Ảnh phòng",
     "addPhotos": "Chọn ảnh từ máy",
     "photosCount": "{{count}} ảnh đã chọn",
+    "photosEditHint": "Chạm vào ảnh để xóa.",
+    "photosEmpty": "Chưa có ảnh — tin đăng có ảnh được quan tâm hơn nhiều.",
     "submit": "Gửi để kiểm duyệt",
     "submittedTitle": "Đã gửi!",
     "submittedBody": "Đội RentAPlace sẽ hẹn chụp ảnh thật và duyệt tin trong 48 giờ."

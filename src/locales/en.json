@@ -348,6 +348,8 @@
     "photosLabel": "Room photos",
     "addPhotos": "Pick photos",
     "photosCount": "{{count}} photos selected",
+    "photosEditHint": "Tap a photo to remove it.",
+    "photosEmpty": "No photos yet — listings with photos get far more interest.",
     "submit": "Submit for review",
     "submittedTitle": "Submitted!",
     "submittedBody": "The RentAPlace team will arrange real photos and review your listing within 48 hours."

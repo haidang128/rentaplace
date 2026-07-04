@@ -1,12 +1,22 @@
 import * as DocumentPicker from "expo-document-picker";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { Redirect, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
-import { Alert, FlatList, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { getApprovedContractSummary, getMyListings, submitContract } from "@/lib/data";
+import {
+  addListingPhotos,
+  getApprovedContractSummary,
+  getListingPhotos,
+  getMyListings,
+  type ListingPhoto,
+  removeListingPhoto,
+  submitContract,
+} from "@/lib/data";
 import { demoStore } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 import { isDemoMode } from "@/lib/supabase";
@@ -95,6 +105,8 @@ export default function MyListingsScreen() {
               £{item.pricePcm}/{t("common.perMonth")} · {item.area}
             </Text>
 
+            <PhotoManager listing={item} />
+
             <View style={{ borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 10, gap: 8 }}>
               <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkSoft }}>
                 {t("contract.uploadTitle")}
@@ -139,5 +151,106 @@ export default function MyListingsScreen() {
         );
       }}
     />
+  );
+}
+
+const MAX_PHOTOS = 8;
+
+function PhotoManager({ listing }: { listing: Listing }) {
+  const { t } = useLang();
+  const [photos, setPhotos] = useState<ListingPhoto[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(() => {
+    getListingPhotos(listing.id).then(setPhotos).catch(() => {});
+  }, [listing.id]);
+  useEffect(load, [load]);
+
+  return (
+    <View style={{ borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 10, gap: 8 }}>
+      <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkSoft }}>
+        {t("listingForm.photosLabel")} ({photos.length}/{MAX_PHOTOS})
+      </Text>
+      {photos.length > 0 ? (
+        <>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {photos.map((photo) => (
+              <Pressable
+                key={photo.id}
+                disabled={busy}
+                onPress={() => {
+                  setBusy(true);
+                  removeListingPhoto(listing, photo)
+                    .catch((e: any) =>
+                      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) })),
+                    )
+                    .finally(() => {
+                      load();
+                      setBusy(false);
+                    });
+                }}
+              >
+                <Image
+                  source={{ uri: photo.url }}
+                  style={{ width: 72, height: 72, borderRadius: 10 }}
+                  contentFit="cover"
+                />
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 3,
+                    right: 3,
+                    width: 18,
+                    height: 18,
+                    borderRadius: 9,
+                    backgroundColor: "rgba(0,0,0,0.55)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontSize: 11, lineHeight: 13 }}>✕</Text>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <Text style={{ fontFamily: fonts.sans, fontSize: 11.5, color: palette.inkMuted }}>
+            {t("listingForm.photosEditHint")}
+          </Text>
+        </>
+      ) : (
+        <Text style={{ fontFamily: fonts.sans, fontSize: 12.5, lineHeight: 19, color: palette.inkSoft }}>
+          {t("listingForm.photosEmpty")}
+        </Text>
+      )}
+      {photos.length < MAX_PHOTOS ? (
+        <PrimaryButton
+          label={busy ? t("onboarding.uploading") : t("listingForm.addPhotos")}
+          tone="gold"
+          disabled={busy}
+          onPress={async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ["images"],
+              allowsMultipleSelection: true,
+              selectionLimit: MAX_PHOTOS - photos.length,
+              quality: 0.7,
+            });
+            if (result.canceled || result.assets.length === 0) return;
+            setBusy(true);
+            try {
+              await addListingPhotos(
+                listing,
+                result.assets.slice(0, MAX_PHOTOS - photos.length).map((a) => a.uri),
+              );
+              Alert.alert("✓", t("onboarding.uploadSuccess"));
+            } catch (e: any) {
+              Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+            } finally {
+              load();
+              setBusy(false);
+            }
+          }}
+        />
+      ) : null}
+    </View>
   );
 }
