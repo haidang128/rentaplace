@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { isDemoMode, supabase } from "@/lib/supabase";
+import { purgeMyStorage } from "@/lib/upload";
 
 export type Role = "renter" | "landlord" | "admin";
 
@@ -47,6 +48,8 @@ type AuthContextValue = {
   /** Real mode: renter -> landlord self-serve upgrade (server-enforced, never admin). */
   becomeLandlord: () => Promise<void>;
   signOut: () => void;
+  /** Permanently delete the account and all its data. Admins are refused server-side. */
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -115,9 +118,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    if (isDemoMode) {
+      // Demo personas are shared seed data — just end the local session.
+      setSession(null);
+      AsyncStorage.removeItem(DEMO_SESSION_KEY).catch(() => {});
+      return;
+    }
+    const { data } = await supabase!.auth.getSession();
+    const userId = data.session?.user.id;
+    if (!userId) return;
+    // Free the storage blobs first (best-effort); the RPC then deletes the
+    // auth user and everything cascades.
+    await purgeMyStorage(userId);
+    const { error } = await supabase!.rpc("delete_account");
+    if (error) throw error;
+    setSession(null);
+    // Clear the now-orphaned local tokens; the server user is already gone.
+    supabase!.auth.signOut().catch(() => {});
+  }, []);
+
   const value = useMemo(
-    () => ({ session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut }),
-    [session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut],
+    () => ({ session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut, deleteAccount }),
+    [session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut, deleteAccount],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

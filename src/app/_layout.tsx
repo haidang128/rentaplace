@@ -66,6 +66,7 @@ export default function RootLayout() {
           <Stack.Screen name="tenancy/[id]" options={subHeader} />
           <Stack.Screen name="landlord/listings" options={subHeader} />
           <Stack.Screen name="contract/[listingId]" options={subHeader} />
+          <Stack.Screen name="delete-account" options={subHeader} />
         </Stack>
       </AuthProvider>
     </LangProvider>

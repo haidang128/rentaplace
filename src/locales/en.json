@@ -285,6 +285,24 @@
     "becomeLandlord": "I'm a landlord — I want to list a room",
     "becomeLandlordHint": "Switch your account to landlord to create listings and get verified. Free."
   },
+  "deleteAccount": {
+    "menuLink": "Delete my account",
+    "title": "Delete account",
+    "intro": "This permanently deletes your account and everything linked to it. It cannot be undone.",
+    "consequences": [
+      "Your profile and sign-in are removed for good.",
+      "All your listings, photos and verification documents are deleted.",
+      "Your conversations and messages disappear for both sides.",
+      "Your tenancy records, deposit confirmations and reviews are removed.",
+      "Saved listings are cleared."
+    ],
+    "adminBlocked": "Admin accounts cannot be deleted from the app. Transfer the admin role first.",
+    "confirmLabel": "Type {{word}} to confirm",
+    "button": "Permanently delete my account",
+    "deleting": "Deleting…",
+    "done": "Your account has been deleted.",
+    "error": "Could not delete the account — please try again. ({{message}})"
+  },
   "onboarding": {
     "title": "Landlord verification",
     "intro": "Three steps to earn the seal on every listing. Free, within 48 hours.",

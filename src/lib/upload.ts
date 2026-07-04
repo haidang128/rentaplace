@@ -44,6 +44,37 @@ export function publicPhotoUrl(path: string): string {
   return supabase!.storage.from("listing-photos").getPublicUrl(path).data.publicUrl;
 }
 
+/**
+ * Best-effort removal of every file a user uploaded, called before account
+ * deletion so the actual blobs are freed (the delete_account RPC only removes
+ * metadata rows as a fallback). Never throws — deletion must not be blocked
+ * by a storage hiccup.
+ */
+export async function purgeMyStorage(userId: string): Promise<void> {
+  if (isDemoMode) return;
+  try {
+    // Verification docs live under certificates/{userId}/…
+    await removeFolder("certificates", userId);
+    // Listing photos and contracts live under {bucket}/{listingId}/…
+    const { data: listings } = await supabase!
+      .from("listings")
+      .select("id")
+      .eq("landlord_id", userId);
+    for (const { id } of listings ?? []) {
+      await removeFolder("listing-photos", id);
+      await removeFolder("contracts", id);
+    }
+  } catch {
+    // fall through — the RPC's metadata cleanup keeps the files unreachable
+  }
+}
+
+async function removeFolder(bucket: string, folder: string): Promise<void> {
+  const { data } = await supabase!.storage.from(bucket).list(folder, { limit: 100 });
+  const paths = (data ?? []).map((f) => `${folder}/${f.name}`);
+  if (paths.length) await supabase!.storage.from(bucket).remove(paths);
+}
+
 /** Short-lived signed URL for a private document (admin review). */
 export async function signedDocUrl(
   bucket: "certificates" | "contracts",

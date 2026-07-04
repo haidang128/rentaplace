@@ -66,6 +66,14 @@ export default function ProfileScreen() {
               {t("auth.signOut")}
             </Text>
           </Pressable>
+
+          <Link href={"/delete-account" as any} asChild>
+            <Pressable style={{ paddingVertical: 4 }}>
+              <Text style={{ fontFamily: fonts.sans, fontSize: 13, color: palette.inkMuted }}>
+                {t("deleteAccount.menuLink")}
+              </Text>
+            </Pressable>
+          </Link>
         </>
       ) : isDemoMode ? (
         <DemoSignIn />

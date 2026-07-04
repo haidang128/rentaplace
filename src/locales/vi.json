@@ -285,6 +285,24 @@
     "becomeLandlord": "Tôi là chủ nhà — tôi muốn đăng tin",
     "becomeLandlordHint": "Chuyển tài khoản sang chủ nhà để đăng tin và xác minh hồ sơ. Miễn phí."
   },
+  "deleteAccount": {
+    "menuLink": "Xóa tài khoản của tôi",
+    "title": "Xóa tài khoản",
+    "intro": "Thao tác này xóa vĩnh viễn tài khoản và mọi dữ liệu liên quan. Không thể hoàn tác.",
+    "consequences": [
+      "Hồ sơ và thông tin đăng nhập của bạn bị xóa vĩnh viễn.",
+      "Mọi tin đăng, ảnh và giấy tờ xác minh đều bị xóa.",
+      "Các cuộc trò chuyện và tin nhắn biến mất ở cả hai phía.",
+      "Hồ sơ thuê nhà, xác nhận tiền cọc và đánh giá bị xóa.",
+      "Danh sách phòng đã lưu bị xóa."
+    ],
+    "adminBlocked": "Tài khoản quản trị không thể tự xóa trong ứng dụng. Hãy chuyển quyền quản trị trước.",
+    "confirmLabel": "Gõ {{word}} để xác nhận",
+    "button": "Xóa vĩnh viễn tài khoản của tôi",
+    "deleting": "Đang xóa…",
+    "done": "Tài khoản của bạn đã được xóa.",
+    "error": "Không thể xóa tài khoản — vui lòng thử lại. ({{message}})"
+  },
   "onboarding": {
     "title": "Xác minh chủ nhà",
     "intro": "Ba bước để nhận dấu kiểm chứng trên mọi tin đăng. Miễn phí, trong 48 giờ.",
