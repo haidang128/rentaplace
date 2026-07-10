@@ -26,9 +26,22 @@ npx expo export --platform web   # static web build → dist/
 2. `npx supabase login && npx supabase link --project-ref <ref>`
 3. `npx supabase db push` (applies `supabase/migrations/`) — creates schema, RLS, trust-tier functions, storage buckets.
 4. Copy `.env.example` → `.env`, fill `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API). Restart the dev server — demo mode switches off automatically.
-5. Auth: enable Email OTP; add Google + Apple providers (Apple required for App Store).
+5. Auth: email + password (currently auto-confirm — no verification email). Before public launch, switch on real email verification: see [Email verification](#email-verification-smtp) below. Google + Apple providers later (Apple required for App Store).
 6. Contract pipeline: `npx supabase secrets set ANTHROPIC_API_KEY=sk-ant-...` then `npx supabase functions deploy summarize-contract`.
 7. Make the first admin: `update profiles set role = 'admin' where id = '<your auth user id>';`
+
+### Email verification (SMTP)
+
+The app already handles both modes: while Supabase auto-confirms, sign-up is instant; once "Confirm email" is enabled, the app shows a "check your email" panel with a resend button, and the email's link lands on `https://rentaplace.expo.app/confirmed` (desktop users arrive signed in). Nothing in the app needs to change — only Supabase dashboard steps:
+
+1. **Create a free SMTP account** — [Brevo](https://www.brevo.com) (300 emails/day free) or [Resend](https://resend.com) (100/day free). Grab the SMTP host, port, username, and password/API key. Sending from a `rentaplace.uk` address needs the domain verified with the provider (SPF + DKIM DNS records — the provider shows exactly what to add); until then use the provider's shared sender.
+2. **Supabase dashboard → Project Settings → Authentication → SMTP Settings**: enable custom SMTP, fill in the credentials, set sender name "RentAPlace" and the sender email.
+3. **Authentication → Sign In / Providers → Email**: turn **ON** "Confirm email".
+4. **Authentication → URL Configuration**: set Site URL to `https://rentaplace.expo.app` and add `https://rentaplace.expo.app/confirmed` to Redirect URLs.
+5. **Authentication → Email Templates → Confirm signup**: replace the default with bilingual copy, e.g. subject `Xác nhận email RentAPlace / Confirm your RentAPlace email`, body keeping the `{{ .ConfirmationURL }}` variable.
+6. Test with a throwaway email: sign up in the app → "check your email" panel appears → click the link → `/confirmed` page → sign in works. Also test the resend button.
+
+Existing accounts created under auto-confirm stay valid (already marked confirmed). If the web app later moves to `rentaplace.uk`, set `EXPO_PUBLIC_WEB_URL=https://rentaplace.uk` in `.env` before exporting and update steps 2–4 accordingly.
 
 ### 2. Web deploy
 

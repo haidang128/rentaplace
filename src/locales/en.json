@@ -283,7 +283,19 @@
     "demoLandlordNew": "New landlord (Cô Lan)",
     "demoAdmin": "RentAPlace admin",
     "becomeLandlord": "I'm a landlord — I want to list a room",
-    "becomeLandlordHint": "Switch your account to landlord to create listings and get verified. Free."
+    "becomeLandlordHint": "Switch your account to landlord to create listings and get verified. Free.",
+    "confirmEmailTitle": "Check your email",
+    "confirmEmailBody": "We sent a confirmation link to {{email}}. Tap the link in the email, then come back here.",
+    "confirmEmailRetry": "I've confirmed — sign in",
+    "confirmEmailStillPending": "Not confirmed yet. Tap the link in the email first (check your spam folder too).",
+    "confirmEmailResend": "Resend the email",
+    "confirmEmailResent": "Sent ✓ — check your inbox",
+    "confirmedTitle": "Email confirmed ✓",
+    "confirmedBody": "Your account is ready. Open the app and sign in.",
+    "confirmedSignedInBody": "Your account is ready and you're signed in.",
+    "confirmedErrorTitle": "Link expired",
+    "confirmedErrorBody": "This confirmation link has expired or was already used. Sign in with your email and password — you can resend the email from there.",
+    "confirmedGoProfile": "Go to your profile"
   },
   "deleteAccount": {
     "menuLink": "Delete my account",

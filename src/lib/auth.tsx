@@ -38,13 +38,25 @@ export const demoPersonas: Record<string, Session> = {
 
 const DEMO_SESSION_KEY = "rentaplace.demo-session";
 
+/** Where the confirmation email's link lands — the web app serves /confirmed. */
+const CONFIRM_REDIRECT = `${process.env.EXPO_PUBLIC_WEB_URL ?? "https://rentaplace.expo.app"}/confirmed`;
+
+/**
+ * "confirm-email" means the account exists but the address is unverified —
+ * only happens once "Confirm email" is switched on in Supabase (see README);
+ * with auto-confirm the outcome is always "signed-in".
+ */
+export type SignInOutcome = "signed-in" | "confirm-email";
+
 type AuthContextValue = {
   session: Session | null;
   ready: boolean;
   /** Demo mode only: sign in as a seeded persona. */
   signInDemo: (persona: keyof typeof demoPersonas) => void;
-  /** Real mode: email + password. Signs up automatically on first login (auto-confirm is on). */
-  signInWithPassword: (email: string, password: string) => Promise<void>;
+  /** Real mode: email + password. Signs up automatically on first login. */
+  signInWithPassword: (email: string, password: string) => Promise<SignInOutcome>;
+  /** Re-send the signup confirmation email (rate-limited by Supabase). */
+  resendConfirmation: (email: string) => Promise<void>;
   /** Real mode: renter -> landlord self-serve upgrade (server-enforced, never admin). */
   becomeLandlord: () => Promise<void>;
   signOut: () => void;
@@ -87,18 +99,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(s)).catch(() => {});
   }, []);
 
-  const signInWithPassword = useCallback(async (email: string, password: string) => {
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<SignInOutcome> => {
+      if (isDemoMode) return "signed-in";
+      const { error } = await supabase!.auth.signInWithPassword({ email, password });
+      if (!error) return "signed-in";
+      const message = error.message.toLowerCase();
+      // Signed up earlier but never clicked the confirmation link.
+      if (message.includes("email not confirmed")) return "confirm-email";
+      // First visit: create the account.
+      if (message.includes("invalid login credentials")) {
+        const { data, error: signUpError } = await supabase!.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: CONFIRM_REDIRECT },
+        });
+        if (signUpError) throw signUpError;
+        if (data.session) return "signed-in"; // auto-confirm on
+        // Confirmation required: a genuinely new user carries identities; an
+        // already-registered email comes back as an obfuscated stub without
+        // any — which here means the password was wrong.
+        if (data.user?.identities?.length) return "confirm-email";
+        throw error;
+      }
+      throw error;
+    },
+    [],
+  );
+
+  const resendConfirmation = useCallback(async (email: string) => {
     if (isDemoMode) return;
-    const { error } = await supabase!.auth.signInWithPassword({ email, password });
-    if (!error) return;
-    // First visit: create the account (auto-confirm returns a session immediately).
-    if (error.message.toLowerCase().includes("invalid login credentials")) {
-      const { data, error: signUpError } = await supabase!.auth.signUp({ email, password });
-      if (signUpError) throw signUpError;
-      if (!data.session) throw error; // existing account, wrong password
-      return;
-    }
-    throw error;
+    const { error } = await supabase!.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: CONFIRM_REDIRECT },
+    });
+    if (error) throw error;
   }, []);
 
   const becomeLandlord = useCallback(async () => {
@@ -139,8 +175,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut, deleteAccount }),
-    [session, ready, signInDemo, signInWithPassword, becomeLandlord, signOut, deleteAccount],
+    () => ({ session, ready, signInDemo, signInWithPassword, resendConfirmation, becomeLandlord, signOut, deleteAccount }),
+    [session, ready, signInDemo, signInWithPassword, resendConfirmation, becomeLandlord, signOut, deleteAccount],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

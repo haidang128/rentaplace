@@ -174,11 +174,77 @@ function DemoSignIn() {
 
 function EmailPasswordSignIn() {
   const { t } = useLang();
-  const { signInWithPassword } = useAuth();
+  const { signInWithPassword, resendConfirmation } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Set when the account exists but the email is still unverified (only
+  // happens once "Confirm email" is enabled in Supabase).
+  const [awaitingEmail, setAwaitingEmail] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
+
+  const submit = async (action: () => Promise<void>) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await action();
+    } catch (e: any) {
+      setError(String(e?.message ?? e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (awaitingEmail) {
+    return (
+      <View
+        style={{
+          backgroundColor: palette.goldWash,
+          borderRadius: radius.tile,
+          borderCurve: "continuous",
+          padding: 16,
+          gap: 12,
+        }}
+      >
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 16, color: palette.goldInk }}>
+          {t("auth.confirmEmailTitle")}
+        </Text>
+        <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 22, color: palette.goldInk }}>
+          {t("auth.confirmEmailBody", { email: awaitingEmail })}
+        </Text>
+        <PrimaryButton
+          label={t("auth.confirmEmailRetry")}
+          disabled={busy}
+          onPress={() =>
+            submit(async () => {
+              const outcome = await signInWithPassword(awaitingEmail, password);
+              if (outcome === "confirm-email") setError(t("auth.confirmEmailStillPending"));
+            })
+          }
+        />
+        <Pressable
+          disabled={busy || resent}
+          onPress={() =>
+            submit(async () => {
+              await resendConfirmation(awaitingEmail);
+              setResent(true);
+            })
+          }
+          style={{ paddingVertical: 6 }}
+        >
+          <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.goldInk }}>
+            {resent ? t("auth.confirmEmailResent") : t("auth.confirmEmailResend")}
+          </Text>
+        </Pressable>
+        {error ? (
+          <Text selectable style={{ fontFamily: fonts.sans, fontSize: 13, color: palette.brick }}>
+            {error}
+          </Text>
+        ) : null}
+      </View>
+    );
+  }
 
   return (
     <View style={{ gap: 12 }}>
@@ -202,17 +268,12 @@ function EmailPasswordSignIn() {
       <PrimaryButton
         label={t("auth.signInTitle")}
         disabled={!email.includes("@") || password.length < 6 || busy}
-        onPress={async () => {
-          setBusy(true);
-          try {
-            setError(null);
-            await signInWithPassword(email.trim(), password);
-          } catch (e: any) {
-            setError(String(e?.message ?? e));
-          } finally {
-            setBusy(false);
-          }
-        }}
+        onPress={() =>
+          submit(async () => {
+            const outcome = await signInWithPassword(email.trim(), password);
+            if (outcome === "confirm-email") setAwaitingEmail(email.trim());
+          })
+        }
       />
       <Text style={{ fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: palette.inkMuted }}>
         {t("auth.passwordHint")}

@@ -19,6 +19,8 @@ export const supabase: SupabaseClient | null = isDemoMode
         ...(isWeb ? {} : { storage: AsyncStorage }),
         autoRefreshToken: !isServer,
         persistSession: !isServer,
-        detectSessionInUrl: false,
+        // On web, pick up the session from the email-confirmation redirect
+        // (/confirmed) so desktop users land already signed in.
+        detectSessionInUrl: isWeb && !isServer,
       },
     });
