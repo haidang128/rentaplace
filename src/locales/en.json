@@ -375,6 +375,7 @@
     "typeRightToLet": "Right to let",
     "typeCertificate": "Deposit certificate",
     "typePhotos": "Photos + listing",
+    "liveReReview": "● Already live — re-reviewing new photos",
     "typeContract": "Contract summary",
     "resolved": "Resolved",
     "viewDocument": "View document ({{kind}}) →",

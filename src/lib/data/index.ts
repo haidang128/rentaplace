@@ -208,10 +208,7 @@ export async function submitVerificationDoc(
     .from("landlord_verifications")
     .upsert({ landlord_id: landlordId, ...column });
   if (error) throw error;
-  const { error: queueError } = await supabase!
-    .from("review_queue")
-    .insert({ type: kind, subject_id: landlordId });
-  if (queueError) throw queueError;
+  await openReviewItem(kind, landlordId);
 }
 
 /** Admin: storage paths of a landlord's verification documents. */
@@ -348,10 +345,9 @@ export async function addListingPhotos(listing: Listing, uris: string[]): Promis
   const startOrder = existing.length ? Math.max(...existing.map((p) => p.sortOrder)) + 1 : 0;
   await uploadListingPhotos(listing.id, uris, startOrder);
   if (listing.status === "live") {
-    const { error } = await supabase!
-      .from("review_queue")
-      .insert({ type: "photos", subject_id: listing.id });
-    if (error) throw error;
+    // Ad stays live; the new photos get re-reviewed alongside it. Dedupe so
+    // adding photos one-at-a-time doesn't file the same item several times.
+    await openReviewItem("photos", listing.id);
   }
 }
 
@@ -404,6 +400,25 @@ export async function toggleSaved(userId: string | null, listingId: string, save
   } else {
     await supabase!.from("saved_listings").insert({ profile_id: userId, listing_id: listingId });
   }
+}
+
+/**
+ * Open a review item, but never a duplicate: if one is already open for this
+ * subject+type it's a no-op. A partial unique index (migration 7) is the real
+ * guard; the pre-check just avoids a noisy error on the common path, and we
+ * swallow the unique-violation (23505) that a concurrent insert would raise.
+ */
+async function openReviewItem(type: QueueItem["type"], subjectId: string): Promise<void> {
+  const { data: existing } = await supabase!
+    .from("review_queue")
+    .select("id")
+    .eq("type", type)
+    .eq("subject_id", subjectId)
+    .eq("status", "open")
+    .maybeSingle();
+  if (existing) return;
+  const { error } = await supabase!.from("review_queue").insert({ type, subject_id: subjectId });
+  if (error && error.code !== "23505") throw error;
 }
 
 export async function getReviewQueue(): Promise<QueueItem[]> {

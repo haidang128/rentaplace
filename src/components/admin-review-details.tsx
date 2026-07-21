@@ -33,6 +33,11 @@ function ListingPreview({ listingId }: { listingId: string }) {
 
   return (
     <View style={{ gap: 8 }}>
+      {listing.status === "live" ? (
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, color: palette.green }}>
+          {t("admin.liveReReview")}
+        </Text>
+      ) : null}
       {listing.photoUrls.length > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {listing.photoUrls.map((uri) => (
