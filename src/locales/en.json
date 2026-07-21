@@ -326,6 +326,7 @@
     "phoneSave": "Save number",
     "phoneSaving": "Saving…",
     "phoneSaved": "Contact number saved.",
+    "phoneInvalid": "Use international format starting with your country code — e.g. +44 7700 900000, not 07700 900000. This keeps WhatsApp working.",
     "identityTitle": "Identity documents",
     "identityBody": "Passport, BRP or UK driving licence.",
     "rightToLetTitle": "Right to let",

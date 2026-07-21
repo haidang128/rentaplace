@@ -62,9 +62,17 @@ export default function VerificationScreen() {
   };
 
   const savePhone = async () => {
+    const trimmed = phone.trim();
+    // Empty clears the number. Otherwise require E.164 international format
+    // (leading +, country code, up to 15 digits) so tel:/wa.me links resolve —
+    // a UK local "07700…" would call fine but break WhatsApp routing.
+    if (trimmed && !/^\+[1-9]\d{7,14}$/.test(trimmed.replace(/[\s()-]/g, ""))) {
+      Alert.alert("!", t("onboarding.phoneInvalid"));
+      return;
+    }
     setSavingPhone(true);
     try {
-      await setLandlordPhone(session.userId, phone);
+      await setLandlordPhone(session.userId, trimmed);
       Alert.alert("✓", t("onboarding.phoneSaved"));
     } catch (e: any) {
       Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));

@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
+import { ContactActions } from "@/components/contact-actions";
 import { Seal } from "@/components/seal";
 import { TrustChip } from "@/components/trust-chip";
 import { fonts, palette, radius } from "@/constants/theme";
@@ -149,6 +150,9 @@ export default function LandlordProfileScreen() {
           />
         ) : null}
       </View>
+
+      {/* contact — Call / WhatsApp, shown to signed-in renters when a number exists */}
+      <ContactActions landlordId={landlord.id} />
 
       {/* reviews */}
       {reviews.length > 0 ? (

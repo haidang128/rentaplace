@@ -326,6 +326,7 @@
     "phoneSave": "Lưu số",
     "phoneSaving": "Đang lưu…",
     "phoneSaved": "Đã lưu số liên hệ.",
+    "phoneInvalid": "Dùng định dạng quốc tế bắt đầu bằng mã quốc gia — ví dụ +44 7700 900000, không phải 07700 900000. Như vậy WhatsApp mới hoạt động.",
     "identityTitle": "Giấy tờ tuỳ thân",
     "identityBody": "Hộ chiếu, BRP hoặc bằng lái xe UK.",
     "rightToLetTitle": "Quyền cho thuê nhà",
