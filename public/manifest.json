@@ -1,0 +1,23 @@
+{
+  "name": "RentAPlace",
+  "short_name": "RentAPlace",
+  "description": "Trusted rooms and flatshares for the Vietnamese community in the UK.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#B23A2E",
+  "background_color": "#FBF6EE",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
