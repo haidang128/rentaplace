@@ -20,7 +20,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 22+: @supabase/realtime-js needs a global WebSocket, which
+          # older Node lacks — the static prerender creates the client at build.
+          node-version: 22
           cache: npm
 
       - run: npm ci
