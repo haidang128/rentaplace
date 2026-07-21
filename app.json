@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "uk.rentaplace.app"
+      "bundleIdentifier": "uk.rentaplace.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "uk.rentaplace.app",
@@ -47,6 +50,12 @@
         "projectId": "b17bb13a-1b20-43e2-bbfb-23209d962676"
       }
     },
-    "owner": "haidang812"
+    "owner": "haidang812",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b17bb13a-1b20-43e2-bbfb-23209d962676"
+    }
   }
 }
