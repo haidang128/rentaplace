@@ -45,7 +45,9 @@ jobs:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
+      # Package is eas-cli (binary "eas"); "npx eas" fails in CI with no global
+      # install. Pin the major so a surprise release can't break the deploy.
       - name: Deploy to production alias
-        run: npx eas deploy --prod --non-interactive
+        run: npx eas-cli@21 deploy --prod --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
