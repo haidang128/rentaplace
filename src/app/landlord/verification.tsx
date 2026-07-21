@@ -20,6 +20,22 @@ import type { DepositScheme } from "@/lib/types";
 
 type DocKind = "identity" | "right_to_let" | "certificate";
 
+/**
+ * Best-effort E.164 normalisation of a typed phone number. Strips separators,
+ * turns a leading "00" international prefix into "+", and prepends "+" when the
+ * number already leads with a country code. A leading single "0" (a national
+ * number) is left untouched — we can't know the country (UK 07… vs VN 09…), so
+ * the caller rejects it and asks for international format.
+ */
+function normalizePhone(raw: string): string {
+  const compact = raw.replace(/[\s()\-.]/g, "");
+  if (!compact) return "";
+  if (compact.startsWith("+")) return compact;
+  if (compact.startsWith("00")) return "+" + compact.slice(2);
+  if (/^[1-9]/.test(compact)) return "+" + compact;
+  return compact;
+}
+
 export default function VerificationScreen() {
   const { t } = useLang();
   const { session } = useAuth();
@@ -62,17 +78,20 @@ export default function VerificationScreen() {
   };
 
   const savePhone = async () => {
-    const trimmed = phone.trim();
-    // Empty clears the number. Otherwise require E.164 international format
-    // (leading +, country code, up to 15 digits) so tel:/wa.me links resolve —
-    // a UK local "07700…" would call fine but break WhatsApp routing.
-    if (trimmed && !/^\+[1-9]\d{7,14}$/.test(trimmed.replace(/[\s()-]/g, ""))) {
+    const normalized = normalizePhone(phone);
+    // Empty clears the number. Otherwise require E.164 (leading +, country
+    // code, up to 15 digits) so tel:/wa.me links resolve. normalizePhone
+    // auto-adds + when the number already leads with a country code (or 00),
+    // but a national "07700…" is ambiguous — Vietnamese mobiles also start
+    // with 0 — so we can't guess the country and reject it with a hint.
+    if (normalized && !/^\+[1-9]\d{7,14}$/.test(normalized)) {
       Alert.alert("!", t("onboarding.phoneInvalid"));
       return;
     }
     setSavingPhone(true);
     try {
-      await setLandlordPhone(session.userId, trimmed);
+      await setLandlordPhone(session.userId, normalized);
+      setPhone(normalized);
       Alert.alert("✓", t("onboarding.phoneSaved"));
     } catch (e: any) {
       Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
