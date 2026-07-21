@@ -3,6 +3,7 @@ import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 
+import { ContactActions } from "@/components/contact-actions";
 import { PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
 import { fonts, palette, radius } from "@/constants/theme";
@@ -281,6 +282,7 @@ export default function ListingDetailScreen() {
           gap: 8,
         }}
       >
+        {landlord ? <ContactActions landlordId={landlord.id} /> : null}
         <PrimaryButton
           label={t("listing.messageLandlord")}
           onPress={async () => {

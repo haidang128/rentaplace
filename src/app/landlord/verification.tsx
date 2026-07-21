@@ -3,11 +3,17 @@ import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 
-import { ChipSelect, PrimaryButton } from "@/components/form";
+import { ChipSelect, LabeledInput, PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { declareScheme, getMyVerification, submitVerificationDoc } from "@/lib/data";
+import {
+  declareScheme,
+  getLandlordPhone,
+  getMyVerification,
+  setLandlordPhone,
+  submitVerificationDoc,
+} from "@/lib/data";
 import type { VerificationState } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 import type { DepositScheme } from "@/lib/types";
@@ -19,9 +25,14 @@ export default function VerificationScreen() {
   const { session } = useAuth();
   const [state, setState] = useState<VerificationState | null>(null);
   const [uploadingKind, setUploadingKind] = useState<DocKind | null>(null);
+  const [phone, setPhone] = useState("");
+  const [savingPhone, setSavingPhone] = useState(false);
 
   const refresh = useCallback(() => {
-    if (session) getMyVerification(session.userId).then(setState);
+    if (session) {
+      getMyVerification(session.userId).then(setState);
+      getLandlordPhone(session.userId).then((p) => setPhone(p ?? ""));
+    }
   }, [session]);
 
   useEffect(refresh, [refresh]);
@@ -47,6 +58,18 @@ export default function VerificationScreen() {
       Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
     } finally {
       setUploadingKind(null);
+    }
+  };
+
+  const savePhone = async () => {
+    setSavingPhone(true);
+    try {
+      await setLandlordPhone(session.userId, phone);
+      Alert.alert("✓", t("onboarding.phoneSaved"));
+    } catch (e: any) {
+      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+    } finally {
+      setSavingPhone(false);
     }
   };
 
@@ -81,6 +104,24 @@ export default function VerificationScreen() {
       <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 22, color: palette.inkSoft }}>
         {t("onboarding.intro")}
       </Text>
+
+      <View style={cardStyle}>
+        <Text style={titleStyle}>{t("onboarding.phoneTitle")}</Text>
+        <Text style={bodyStyle}>{t("onboarding.phoneBody")}</Text>
+        <LabeledInput
+          label={t("onboarding.phoneLabel")}
+          value={phone}
+          onChangeText={setPhone}
+          placeholder="+44 7700 900000"
+          keyboardType="phone-pad"
+          autoComplete="tel"
+        />
+        <PrimaryButton
+          label={savingPhone ? t("onboarding.phoneSaving") : t("onboarding.phoneSave")}
+          onPress={savePhone}
+          disabled={savingPhone}
+        />
+      </View>
 
       <DocCard
         title={t("onboarding.identityTitle")}

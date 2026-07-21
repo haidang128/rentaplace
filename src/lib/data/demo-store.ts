@@ -89,6 +89,7 @@ type DemoState = {
   tenancies: Tenancy[];
   extraReviews: { landlordId: string; stars: number; body: string; depositReturnedInFull: boolean }[];
   contractSummaries: ContractSummary[];
+  landlordPhones: Record<string, string>;
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -114,6 +115,10 @@ function initialState(): DemoState {
     savedIds: [],
     tenancies: [],
     extraReviews: [],
+    landlordPhones: {
+      [demoLandlords[0].id]: "+44 7700 900001",
+      [demoLandlords[1].id]: "+44 7700 900002",
+    },
     contractSummaries: [
       // Seeded approved summary for the Fallowfield listing (design screen 1f)
       {
@@ -223,6 +228,19 @@ export const demoStore = {
         createdAt: new Date().toISOString(),
       });
     }
+    await save();
+  },
+
+  async getLandlordPhone(landlordId: string): Promise<string | null> {
+    const s = await load();
+    return s.landlordPhones[landlordId] ?? null;
+  },
+
+  async setLandlordPhone(landlordId: string, phone: string) {
+    const s = await load();
+    const trimmed = phone.trim();
+    if (trimmed) s.landlordPhones[landlordId] = trimmed;
+    else delete s.landlordPhones[landlordId];
     await save();
   },
 

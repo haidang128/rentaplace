@@ -240,6 +240,30 @@ export async function declareScheme(landlordId: string, scheme: DepositScheme): 
   if (error) throw error;
 }
 
+/**
+ * Landlord's contact number. Reads go through a signed-in-only RPC so anon
+ * callers (who can read profiles) can't scrape numbers; writes hit the
+ * owner-restricted landlord_contacts table. Returns null when unset or hidden.
+ */
+export async function getLandlordPhone(landlordId: string): Promise<string | null> {
+  if (isDemoMode) return demoStore.getLandlordPhone(landlordId);
+  const { data, error } = await supabase!.rpc("get_landlord_phone", { p_landlord_id: landlordId });
+  if (error) throw error;
+  return (data as string | null) ?? null;
+}
+
+export async function setLandlordPhone(landlordId: string, phone: string): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.setLandlordPhone(landlordId, phone);
+    return;
+  }
+  const trimmed = phone.trim();
+  const { error } = await supabase!
+    .from("landlord_contacts")
+    .upsert({ landlord_id: landlordId, phone: trimmed || null });
+  if (error) throw error;
+}
+
 export type NewListingInput = Omit<Listing, "id" | "status" | "photosCheckedAt" | "photoUrls">;
 
 export async function createListing(input: NewListingInput, landlordLabel: string): Promise<string> {
