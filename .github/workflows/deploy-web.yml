@@ -1,0 +1,49 @@
+name: Deploy web to EAS Hosting
+
+# Every push to main rebuilds the static web export and promotes it to the
+# production alias (rentaplace.expo.app). Can also be run manually.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push supersedes an in-flight run.
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Fail fast rather than silently shipping a demo-mode (no backend) build
+      # to production if the Supabase secrets aren't configured.
+      - name: Require backend secrets
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          test -n "$EXPO_PUBLIC_SUPABASE_URL" || { echo "::error::EXPO_PUBLIC_SUPABASE_URL secret is missing"; exit 1; }
+          test -n "$EXPO_PUBLIC_SUPABASE_ANON_KEY" || { echo "::error::EXPO_PUBLIC_SUPABASE_ANON_KEY secret is missing"; exit 1; }
+
+      # EXPO_PUBLIC_* vars are inlined into the bundle here. Without them the
+      # app builds in demo mode (no backend), so these secrets are required.
+      - name: Export web
+        run: npx expo export --platform web
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Deploy to production alias
+        run: npx eas deploy --prod --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
