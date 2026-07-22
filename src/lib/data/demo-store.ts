@@ -90,6 +90,8 @@ type DemoState = {
   extraReviews: { landlordId: string; stars: number; body: string; depositReturnedInFull: boolean }[];
   contractSummaries: ContractSummary[];
   landlordPhones: Record<string, string>;
+  /** Edits and archives layered over both seeded and created listings. */
+  listingOverrides: Record<string, Partial<Listing>>;
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -112,6 +114,7 @@ function initialState(): DemoState {
       },
     },
     createdListings: [],
+    listingOverrides: {},
     savedIds: [],
     tenancies: [],
     extraReviews: [],
@@ -262,6 +265,17 @@ export const demoStore = {
       status: "open",
       createdAt: new Date().toISOString(),
     });
+    await save();
+  },
+
+  async getListingOverrides(): Promise<Record<string, Partial<Listing>>> {
+    const s = await load();
+    return s.listingOverrides;
+  },
+
+  async overrideListing(id: string, patch: Partial<Listing>) {
+    const s = await load();
+    s.listingOverrides[id] = { ...s.listingOverrides[id], ...patch };
     await save();
   },
 

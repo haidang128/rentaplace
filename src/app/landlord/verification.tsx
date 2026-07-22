@@ -1,9 +1,10 @@
 import * as DocumentPicker from "expo-document-picker";
 import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { ChipSelect, LabeledInput, PrimaryButton } from "@/components/form";
+import { Notice, useNotice } from "@/components/notice";
 import { Seal } from "@/components/seal";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
@@ -38,11 +39,12 @@ function normalizePhone(raw: string): string {
 
 export default function VerificationScreen() {
   const { t } = useLang();
-  const { session } = useAuth();
+  const { session, ready } = useAuth();
   const [state, setState] = useState<VerificationState | null>(null);
   const [uploadingKind, setUploadingKind] = useState<DocKind | null>(null);
   const [phone, setPhone] = useState("");
   const [savingPhone, setSavingPhone] = useState(false);
+  const { notice, showSuccess, showError, clearNotice } = useNotice();
 
   const refresh = useCallback(() => {
     if (session) {
@@ -53,7 +55,8 @@ export default function VerificationScreen() {
 
   useEffect(refresh, [refresh]);
 
-  if (!session || session.role !== "landlord") return <Redirect href="/(tabs)/profile" />;
+  if (ready && (!session || session.role !== "landlord")) return <Redirect href="/(tabs)/profile" />;
+  if (!session) return null;
 
   const pickAndSubmit = async (kind: DocKind) => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -68,10 +71,10 @@ export default function VerificationScreen() {
         name: asset.name,
         mimeType: asset.mimeType ?? "application/octet-stream",
       });
-      Alert.alert("✓", t("onboarding.uploadSuccess"));
+      showSuccess(t("onboarding.uploadSuccess"));
       refresh();
     } catch (e: any) {
-      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+      showError(t("onboarding.uploadError", { message: String(e?.message ?? e) }));
     } finally {
       setUploadingKind(null);
     }
@@ -85,16 +88,17 @@ export default function VerificationScreen() {
     // but a national "07700…" is ambiguous — Vietnamese mobiles also start
     // with 0 — so we can't guess the country and reject it with a hint.
     if (normalized && !/^\+[1-9]\d{7,14}$/.test(normalized)) {
-      Alert.alert("!", t("onboarding.phoneInvalid"));
+      showError(t("onboarding.phoneInvalid"));
       return;
     }
     setSavingPhone(true);
+    clearNotice();
     try {
       await setLandlordPhone(session.userId, normalized);
       setPhone(normalized);
-      Alert.alert("✓", t("onboarding.phoneSaved"));
+      showSuccess(t("onboarding.phoneSaved"));
     } catch (e: any) {
-      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+      showError(t("onboarding.uploadError", { message: String(e?.message ?? e) }));
     } finally {
       setSavingPhone(false);
     }
@@ -131,6 +135,8 @@ export default function VerificationScreen() {
       <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 22, color: palette.inkSoft }}>
         {t("onboarding.intro")}
       </Text>
+
+      <Notice notice={notice} />
 
       <View style={cardStyle}>
         <Text style={titleStyle}>{t("onboarding.phoneTitle")}</Text>

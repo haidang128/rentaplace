@@ -1,15 +1,17 @@
 import * as DocumentPicker from "expo-document-picker";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { Redirect, useFocusEffect } from "expo-router";
+import { Link, Redirect, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
 import { PrimaryButton } from "@/components/form";
+import { Notice, useNotice } from "@/components/notice";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
 import {
   addListingPhotos,
+  archiveListing,
   getApprovedContractSummary,
   getListingPhotos,
   getMyListings,
@@ -27,7 +29,7 @@ type ContractState = "none" | "pending" | "approved";
 
 export default function MyListingsScreen() {
   const { t } = useLang();
-  const { session } = useAuth();
+  const { session, ready } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [contractStates, setContractStates] = useState<Record<string, ContractState>>({});
 
@@ -51,7 +53,10 @@ export default function MyListingsScreen() {
 
   useFocusEffect(refresh);
 
-  if (!session || session.role !== "landlord") return <Redirect href="/(tabs)/profile" />;
+  // Wait for the stored session before deciding — otherwise opening this URL
+  // directly bounces the landlord to Profile before auth has loaded.
+  if (ready && (!session || session.role !== "landlord")) return <Redirect href="/(tabs)/profile" />;
+  if (!session) return null;
 
   const statusLabels: Record<string, string> = {
     live: "● live",
@@ -105,52 +110,163 @@ export default function MyListingsScreen() {
               £{item.pricePcm}/{t("common.perMonth")} · {item.area}
             </Text>
 
+            <ListingActions listing={item} onDeleted={refresh} />
+
             <PhotoManager listing={item} />
 
-            <View style={{ borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 10, gap: 8 }}>
-              <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkSoft }}>
-                {t("contract.uploadTitle")}
-              </Text>
-              {contractState === "approved" ? (
-                <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.green }}>
-                  {t("contract.uploadApproved")}
-                </Text>
-              ) : contractState === "pending" ? (
-                <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.goldInk }}>
-                  {t("contract.uploadPending")}
-                </Text>
-              ) : (
-                <>
-                  <Text style={{ fontFamily: fonts.sans, fontSize: 12.5, lineHeight: 19, color: palette.inkSoft }}>
-                    {t("contract.uploadBody")}
-                  </Text>
-                  <PrimaryButton
-                    label={t("contract.uploadButton")}
-                    onPress={async () => {
-                      const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf" });
-                      if (result.canceled || !result.assets[0]) return;
-                      try {
-                        const storagePath = await uploadToBucket(
-                          "contracts",
-                          `${item.id}/${Date.now()}-contract.pdf`,
-                          result.assets[0].uri,
-                          "application/pdf",
-                        );
-                        await submitContract(item, storagePath);
-                        Alert.alert("✓", t("onboarding.uploadSuccess"));
-                        refresh();
-                      } catch (e: any) {
-                        Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
-                      }
-                    }}
-                  />
-                </>
-              )}
-            </View>
+            <ContractUpload listing={item} state={contractState} onUploaded={refresh} />
           </View>
         );
       }}
     />
+  );
+}
+
+function ContractUpload({
+  listing,
+  state,
+  onUploaded,
+}: {
+  listing: Listing;
+  state: ContractState;
+  onUploaded: () => void;
+}) {
+  const { t } = useLang();
+  const [busy, setBusy] = useState(false);
+  const { notice, showSuccess, showError, clearNotice } = useNotice();
+
+  return (
+    <View style={{ borderTopWidth: 1, borderTopColor: palette.line, paddingTop: 10, gap: 8 }}>
+      <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkSoft }}>
+        {t("contract.uploadTitle")}
+      </Text>
+      {state === "approved" ? (
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.green }}>
+          {t("contract.uploadApproved")}
+        </Text>
+      ) : state === "pending" ? (
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.goldInk }}>
+          {t("contract.uploadPending")}
+        </Text>
+      ) : (
+        <>
+          <Text style={{ fontFamily: fonts.sans, fontSize: 12.5, lineHeight: 19, color: palette.inkSoft }}>
+            {t("contract.uploadBody")}
+          </Text>
+          <Notice notice={notice} />
+          <PrimaryButton
+            label={busy ? t("onboarding.uploading") : t("contract.uploadButton")}
+            disabled={busy}
+            onPress={async () => {
+              const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf" });
+              if (result.canceled || !result.assets[0]) return;
+              setBusy(true);
+              clearNotice();
+              try {
+                const storagePath = await uploadToBucket(
+                  "contracts",
+                  `${listing.id}/${Date.now()}-contract.pdf`,
+                  result.assets[0].uri,
+                  "application/pdf",
+                );
+                await submitContract(listing, storagePath);
+                showSuccess(t("onboarding.uploadSuccess"));
+                onUploaded();
+              } catch (e: any) {
+                showError(t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+              } finally {
+                setBusy(false);
+              }
+            }}
+          />
+        </>
+      )}
+    </View>
+  );
+}
+
+/**
+ * Edit + delete for one listing. The delete confirms in place rather than with
+ * Alert.alert, which does nothing on web.
+ */
+function ListingActions({ listing, onDeleted }: { listing: Listing; onDeleted: () => void }) {
+  const { t } = useLang();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <View style={{ gap: 6 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Link href={`/landlord/edit-listing/${listing.id}`} asChild>
+          <Pressable
+            style={{
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 999,
+              borderWidth: 1.5,
+              borderColor: palette.lineStrong,
+              backgroundColor: palette.cream,
+            }}
+          >
+            <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.ink }}>
+              {t("onboarding.editListing")}
+            </Text>
+          </Pressable>
+        </Link>
+        <Pressable
+          disabled={busy}
+          onPress={() => {
+            if (!confirming) {
+              setConfirming(true);
+              return;
+            }
+            setBusy(true);
+            setError(null);
+            archiveListing(listing.id)
+              .then(onDeleted)
+              .catch((e: any) => setError(t("onboarding.uploadError", { message: String(e?.message ?? e) })))
+              .finally(() => {
+                setConfirming(false);
+                setBusy(false);
+              });
+          }}
+          style={{
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            borderRadius: 999,
+            borderWidth: 1.5,
+            borderColor: palette.brick,
+            backgroundColor: confirming ? palette.brick : "transparent",
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: fonts.sansBold,
+              fontSize: 13,
+              color: confirming ? "#fff" : palette.brick,
+            }}
+          >
+            {confirming ? t("onboarding.deleteListingConfirm") : t("onboarding.deleteListing")}
+          </Text>
+        </Pressable>
+        {confirming && !busy ? (
+          <Pressable onPress={() => setConfirming(false)} style={{ paddingVertical: 8 }}>
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13, color: palette.inkMuted }}>
+              {t("common.cancel")}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+      {confirming ? (
+        <Text style={{ fontFamily: fonts.sans, fontSize: 11.5, lineHeight: 17, color: palette.inkMuted }}>
+          {t("onboarding.deleteListingHint")}
+        </Text>
+      ) : null}
+      {error ? (
+        <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 12, color: palette.brickDark }}>{error}</Text>
+      ) : null}
+    </View>
   );
 }
 
@@ -160,6 +276,7 @@ function PhotoManager({ listing }: { listing: Listing }) {
   const { t } = useLang();
   const [photos, setPhotos] = useState<ListingPhoto[]>([]);
   const [busy, setBusy] = useState(false);
+  const { notice, showSuccess, showError, clearNotice } = useNotice();
 
   const load = useCallback(() => {
     getListingPhotos(listing.id).then(setPhotos).catch(() => {});
@@ -180,9 +297,10 @@ function PhotoManager({ listing }: { listing: Listing }) {
                 disabled={busy}
                 onPress={() => {
                   setBusy(true);
+                  clearNotice();
                   removeListingPhoto(listing, photo)
                     .catch((e: any) =>
-                      Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) })),
+                      showError(t("onboarding.uploadError", { message: String(e?.message ?? e) })),
                     )
                     .finally(() => {
                       load();
@@ -222,6 +340,7 @@ function PhotoManager({ listing }: { listing: Listing }) {
           {t("listingForm.photosEmpty")}
         </Text>
       )}
+      <Notice notice={notice} />
       {photos.length < MAX_PHOTOS ? (
         <PrimaryButton
           label={busy ? t("onboarding.uploading") : t("listingForm.addPhotos")}
@@ -236,14 +355,15 @@ function PhotoManager({ listing }: { listing: Listing }) {
             });
             if (result.canceled || result.assets.length === 0) return;
             setBusy(true);
+            clearNotice();
             try {
               await addListingPhotos(
                 listing,
                 result.assets.slice(0, MAX_PHOTOS - photos.length).map((a) => a.uri),
               );
-              Alert.alert("✓", t("onboarding.uploadSuccess"));
+              showSuccess(t("onboarding.uploadSuccess"));
             } catch (e: any) {
-              Alert.alert("!", t("onboarding.uploadError", { message: String(e?.message ?? e) }));
+              showError(t("onboarding.uploadError", { message: String(e?.message ?? e) }));
             } finally {
               load();
               setBusy(false);

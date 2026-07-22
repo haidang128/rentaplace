@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { LabeledInput, PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
@@ -75,7 +75,8 @@ export default function DeleteAccountScreen() {
               setError(null);
               try {
                 await deleteAccount();
-                Alert.alert("✓", t("deleteAccount.done"));
+                // The signed-out Profile screen is the confirmation — an alert
+                // here was invisible on web and raced the dismiss on native.
                 router.dismissTo("/(tabs)/profile");
               } catch (e: any) {
                 setError(t("deleteAccount.error", { message: String(e?.message ?? e) }));

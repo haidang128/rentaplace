@@ -42,10 +42,17 @@ function mapListing(row: any): Listing {
   };
 }
 
+/** Demo seed data is immutable, so edits and archives are kept as an overlay. */
+async function withDemoOverrides(rows: Listing[]): Promise<Listing[]> {
+  const overrides = await demoStore.getListingOverrides();
+  return rows.map((l) => (overrides[l.id] ? { ...l, ...overrides[l.id] } : l));
+}
+
 export async function getLiveListings(): Promise<Listing[]> {
   if (isDemoMode) {
     const created = await demoStore.getCreatedListings();
-    return [...demoListings, ...created].filter((l) => l.status === "live");
+    const all = await withDemoOverrides([...demoListings, ...created]);
+    return all.filter((l) => l.status === "live");
   }
   const { data, error } = await supabase!
     .from("listings")
@@ -57,7 +64,12 @@ export async function getLiveListings(): Promise<Listing[]> {
 }
 
 export async function getListing(id: string): Promise<Listing | null> {
-  if (isDemoMode) return demoListings.find((l) => l.id === id) ?? null;
+  if (isDemoMode) {
+    const created = await demoStore.getCreatedListings();
+    const match = [...demoListings, ...created].find((l) => l.id === id);
+    if (!match) return null;
+    return (await withDemoOverrides([match]))[0];
+  }
   const { data, error } = await supabase!
     .from("listings")
     .select("*, listing_photos(path, sort_order)")
@@ -396,15 +408,62 @@ export async function removeListingPhoto(listing: Listing, photo: ListingPhoto):
 export async function getMyListings(landlordId: string): Promise<Listing[]> {
   if (isDemoMode) {
     const created = await demoStore.getCreatedListings(landlordId);
-    return [...demoListings.filter((l) => l.landlordId === landlordId), ...created];
+    const mine = await withDemoOverrides([
+      ...demoListings.filter((l) => l.landlordId === landlordId),
+      ...created,
+    ]);
+    return mine.filter((l) => l.status !== "archived");
   }
   const { data, error } = await supabase!
     .from("listings")
     .select("*, listing_photos(path, sort_order)")
     .eq("landlord_id", landlordId)
+    .neq("status", "archived")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data.map(mapListing);
+}
+
+/** Everything a landlord may change after publishing — never the owner or status. */
+export type ListingEdit = Omit<NewListingInput, "landlordId">;
+
+export async function updateListing(id: string, input: ListingEdit): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.overrideListing(id, input);
+    return;
+  }
+  const { error } = await supabase!
+    .from("listings")
+    .update({
+      title: input.title,
+      city: input.city,
+      area: input.area,
+      room_type: input.roomType,
+      price_pcm: input.pricePcm,
+      deposit_amount: input.depositAmount,
+      bills_included: input.billsIncluded,
+      vietnamese_flatmates: input.vietnameseFlatmates,
+      near_university: input.nearUniversity,
+      live_in_landlord: input.liveInLandlord,
+      available_from: input.availableFrom,
+      description: input.description,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/**
+ * Landlord-facing "delete". Archiving rather than deleting keeps the tenancies,
+ * reviews and deposit confirmations hanging off the listing intact — those are
+ * the trust record, and a row delete would cascade them away.
+ */
+export async function archiveListing(id: string): Promise<void> {
+  if (isDemoMode) {
+    await demoStore.overrideListing(id, { status: "archived" });
+    return;
+  }
+  const { error } = await supabase!.from("listings").update({ status: "archived" }).eq("id", id);
+  if (error) throw error;
 }
 
 export async function getSavedIds(userId: string | null): Promise<string[]> {
@@ -563,7 +622,9 @@ export async function endTenancyWithReview(
     await demoStore.endTenancyWithReview(tenancyId, review);
     return;
   }
-  await supabase!.from("tenancies").update({ status: "ended" }).eq("id", tenancyId);
+  // Review first: if it fails the tenancy stays active, so the renter still has
+  // the "end tenancy & review" entry point and can retry. Ending first would
+  // hide the form for good and lose the rating.
   const { error } = await supabase!.from("reviews").insert({
     tenancy_id: tenancyId,
     stars: review.stars,
@@ -571,6 +632,11 @@ export async function endTenancyWithReview(
     deposit_returned_in_full: review.depositReturnedInFull,
   });
   if (error) throw error;
+  const { error: endError } = await supabase!
+    .from("tenancies")
+    .update({ status: "ended" })
+    .eq("id", tenancyId);
+  if (endError) throw endError;
 }
 
 // ── M6: contract summaries ───────────────────────────────────────────────────

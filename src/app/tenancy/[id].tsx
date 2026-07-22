@@ -1,8 +1,9 @@
 import { Link, Redirect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
 import { LabeledInput, PrimaryButton, ToggleRow } from "@/components/form";
+import { Notice, useNotice } from "@/components/notice";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
 import { confirmDeposit, endTenancyWithReview, getMyTenancies } from "@/lib/data";
@@ -17,22 +18,40 @@ export default function TenancyDetailScreen() {
   const { t, lang } = useLang();
   const { session, ready } = useAuth();
   const [tenancy, setTenancy] = useState<Tenancy | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [stars, setStars] = useState(5);
   const [body, setBody] = useState("");
   const [returnedInFull, setReturnedInFull] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [reviewDone, setReviewDone] = useState(false);
+  const { notice, showError, clearNotice } = useNotice();
 
   const refresh = useCallback(() => {
     if (session && id) {
-      getMyTenancies(session.userId).then((all) => setTenancy(all.find((x) => x.id === id) ?? null));
+      getMyTenancies(session.userId)
+        .then((all) => setTenancy(all.find((x) => x.id === id) ?? null))
+        .finally(() => setLoaded(true));
     }
   }, [session, id]);
 
   useEffect(refresh, [refresh]);
 
   if (ready && !session) return <Redirect href="/(tabs)/profile" />;
-  if (!tenancy) return null;
+  if (!tenancy) {
+    // Blank until the fetch resolves; say so plainly if it really isn't there.
+    return loaded && ready ? (
+      <View style={{ flex: 1, backgroundColor: palette.paper, padding: 24 }}>
+        <Text style={{ fontFamily: fonts.sans, fontSize: 14.5, lineHeight: 22, color: palette.inkMuted }}>
+          {t("tenancy.notFound")}
+        </Text>
+      </View>
+    ) : (
+      <View style={{ flex: 1, backgroundColor: palette.paper, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator color={palette.brick} />
+      </View>
+    );
+  }
 
   const day = dayOfLoop(tenancy.moveInDate);
   const scheme = tenancy.scheme ? schemeLabels[tenancy.scheme] : "DPS";
@@ -145,13 +164,20 @@ export default function TenancyDetailScreen() {
         </>
       )}
 
-      {/* End of tenancy → review */}
-      {tenancy.status === "active" && !reviewing ? (
+      {/* Rating stays reachable after the tenancy ends — an ended tenancy that
+          was never reviewed used to lose the entry point permanently. */}
+      {!tenancy.reviewed && !reviewing && !reviewDone ? (
         <Pressable onPress={() => setReviewing(true)} style={{ paddingVertical: 6 }}>
           <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.brick }}>
-            {t("tenancy.endCta")}
+            {tenancy.status === "active" ? t("tenancy.endCta") : t("tenancy.rateCta")}
           </Text>
         </Pressable>
+      ) : null}
+
+      {tenancy.reviewed && !reviewDone ? (
+        <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.inkMuted }}>
+          {t("tenancy.reviewAlready")}
+        </Text>
       ) : null}
 
       {reviewing && !reviewDone ? (
@@ -184,12 +210,28 @@ export default function TenancyDetailScreen() {
             style={{ minHeight: 80, textAlignVertical: "top" }}
           />
           <ToggleRow label={t("tenancy.reviewReturned")} value={returnedInFull} onChange={setReturnedInFull} />
+          <Notice notice={notice} />
           <PrimaryButton
-            label={t("tenancy.reviewSubmit")}
+            label={submitting ? t("tenancy.reviewSubmitting") : t("tenancy.reviewSubmit")}
+            disabled={submitting}
             onPress={async () => {
-              await endTenancyWithReview(tenancy.id, { stars, body: body.trim(), depositReturnedInFull: returnedInFull });
-              setReviewDone(true);
-              refresh();
+              setSubmitting(true);
+              clearNotice();
+              try {
+                await endTenancyWithReview(tenancy.id, {
+                  stars,
+                  body: body.trim(),
+                  depositReturnedInFull: returnedInFull,
+                });
+                setReviewDone(true);
+                refresh();
+              } catch (e: any) {
+                // Used to reject unhandled: the form just sat there and the
+                // rating was lost without a word.
+                showError(t("tenancy.reviewError", { message: String(e?.message ?? e) }));
+              } finally {
+                setSubmitting(false);
+              }
             }}
           />
         </View>

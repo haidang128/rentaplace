@@ -11,6 +11,7 @@
     "back": "Back",
     "confirm": "Confirm",
     "notYet": "Not yet",
+    "cancel": "Cancel",
     "learnMore": "Learn more"
   },
   "tabs": {
@@ -26,7 +27,8 @@
       "landlords": "For landlords",
       "langButton": "Tiếng Việt",
       "langButtonShort": "VI",
-      "cta": "Find a room"
+      "cta": "Find a room",
+      "account": "My account"
     },
     "hero": {
       "eyebrow": "For the Vietnamese community in the UK",
@@ -259,6 +261,11 @@
     "reviewBody": "Comments",
     "reviewReturned": "Deposit returned in full",
     "reviewSubmit": "Submit review",
+    "reviewSubmitting": "Sending…",
+    "reviewError": "Could not save your review — please try again. ({{message}})",
+    "reviewAlready": "You've already reviewed this tenancy.",
+    "rateCta": "Rate this landlord",
+    "notFound": "This tenancy could not be found. It may have been removed.",
     "reviewDone": "Thank you! Reviews make renting safer for the whole community."
   },
   "chat": {
@@ -345,7 +352,11 @@
     "statusApproved": "Approved ✓",
     "statusRejected": "Rejected — resubmit",
     "myListings": "My listings",
-    "newListing": "New listing"
+    "newListing": "New listing",
+    "editListing": "Edit",
+    "deleteListing": "Delete",
+    "deleteListingConfirm": "Delete for good?",
+    "deleteListingHint": "The listing comes down everywhere. Any tenancy and review history stays on your record."
   },
   "listingForm": {
     "title": "New listing",
@@ -372,6 +383,8 @@
     "photosEditHint": "Tap a photo to remove it.",
     "photosEmpty": "No photos yet — listings with photos get far more interest.",
     "submit": "Submit for review",
+    "editTitle": "Edit listing",
+    "saveChanges": "Save changes",
     "submittedTitle": "Submitted!",
     "submittedBody": "The RentAPlace team will arrange real photos and review your listing within 48 hours."
   },

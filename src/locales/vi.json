@@ -11,6 +11,7 @@
     "back": "Quay lại",
     "confirm": "Xác nhận",
     "notYet": "Chưa",
+    "cancel": "Huỷ",
     "learnMore": "Tìm hiểu thêm"
   },
   "tabs": {
@@ -26,7 +27,8 @@
       "landlords": "Cho chủ nhà",
       "langButton": "English",
       "langButtonShort": "EN",
-      "cta": "Tìm phòng"
+      "cta": "Tìm phòng",
+      "account": "Tài khoản"
     },
     "hero": {
       "eyebrow": "Dành cho người Việt tại Vương quốc Anh",
@@ -259,6 +261,11 @@
     "reviewBody": "Nhận xét",
     "reviewReturned": "Cọc được hoàn trả đầy đủ",
     "reviewSubmit": "Gửi đánh giá",
+    "reviewSubmitting": "Đang gửi…",
+    "reviewError": "Không lưu được đánh giá — vui lòng thử lại. ({{message}})",
+    "reviewAlready": "Bạn đã đánh giá lần thuê này rồi.",
+    "rateCta": "Đánh giá chủ nhà",
+    "notFound": "Không tìm thấy lần thuê này. Có thể nó đã bị xoá.",
     "reviewDone": "Cảm ơn bạn! Đánh giá giúp cả cộng đồng thuê an toàn hơn."
   },
   "chat": {
@@ -345,7 +352,11 @@
     "statusApproved": "Đã duyệt ✓",
     "statusRejected": "Bị từ chối — nộp lại",
     "myListings": "Tin đăng của tôi",
-    "newListing": "Đăng tin mới"
+    "newListing": "Đăng tin mới",
+    "editListing": "Sửa",
+    "deleteListing": "Xoá",
+    "deleteListingConfirm": "Xoá hẳn?",
+    "deleteListingHint": "Tin đăng sẽ bị gỡ khỏi mọi nơi. Lịch sử thuê nhà và đánh giá vẫn được giữ lại."
   },
   "listingForm": {
     "title": "Đăng tin mới",
@@ -372,6 +383,8 @@
     "photosEditHint": "Chạm vào ảnh để xóa.",
     "photosEmpty": "Chưa có ảnh — tin đăng có ảnh được quan tâm hơn nhiều.",
     "submit": "Gửi để kiểm duyệt",
+    "editTitle": "Sửa tin đăng",
+    "saveChanges": "Lưu thay đổi",
     "submittedTitle": "Đã gửi!",
     "submittedBody": "Đội RentAPlace sẽ hẹn chụp ảnh thật và duyệt tin trong 48 giờ."
   },

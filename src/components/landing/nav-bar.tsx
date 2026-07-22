@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { Seal } from "@/components/seal";
 import { fonts, palette } from "@/constants/theme";
+import { useAuth } from "@/lib/auth";
 import { useLang } from "@/lib/i18n";
 
 export type LandingSection = "how" | "safe" | "landlords";
@@ -15,6 +16,7 @@ export function NavBar({
   onNav?: (section: LandingSection) => void;
 }) {
   const { t, toggleLang } = useLang();
+  const { session, ready } = useAuth();
 
   return (
     <View
@@ -67,21 +69,34 @@ export function NavBar({
             {isDesktop ? t("landing.nav.langButton") : t("landing.nav.langButtonShort")}
           </Text>
         </Pressable>
-        <Link href="/profile" asChild>
-          <Pressable
-            style={{
-              paddingHorizontal: isDesktop ? 18 : 14,
-              paddingVertical: isDesktop ? 10 : 9,
-              borderRadius: 999,
-              borderWidth: 1.5,
-              borderColor: palette.brick,
-            }}
-          >
-            <Text style={{ fontFamily: fonts.sansBold, fontSize: 13.5, color: palette.brick }}>
-              {t("auth.signInTitle")}
-            </Text>
-          </Pressable>
-        </Link>
+        {/* Hidden until the session has loaded so signed-in visitors never see "Sign in" flash. */}
+        {ready ? (
+          <Link href="/profile" asChild>
+            <Pressable
+              style={{
+                paddingHorizontal: isDesktop ? 18 : 14,
+                paddingVertical: isDesktop ? 10 : 9,
+                borderRadius: 999,
+                borderWidth: 1.5,
+                borderColor: palette.brick,
+              }}
+            >
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontFamily: fonts.sansBold,
+                  fontSize: 13.5,
+                  color: palette.brick,
+                  maxWidth: isDesktop ? 180 : 110,
+                }}
+              >
+                {session
+                  ? session.displayName || t("landing.nav.account")
+                  : t("auth.signInTitle")}
+              </Text>
+            </Pressable>
+          </Link>
+        ) : null}
         {isDesktop ? (
           <Link href="/browse" asChild>
             <Pressable
