@@ -351,6 +351,8 @@
     "statusSubmitted": "Đang chờ duyệt",
     "statusApproved": "Đã duyệt ✓",
     "statusRejected": "Bị từ chối — nộp lại",
+    "listingRejectedHint": "Đội ngũ đã trả lại tin này. Hãy sửa tin rồi lưu — tin sẽ được gửi duyệt lại.",
+    "listingReReview": "Thay đổi của bạn đang được duyệt. Trong lúc đó người thuê vẫn thấy bản đã duyệt.",
     "myListings": "Tin đăng của tôi",
     "newListing": "Đăng tin mới",
     "editListing": "Sửa",

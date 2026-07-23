@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { demoLandlords } from "@/lib/data/demo-data";
+import { demoLandlords, demoListings } from "@/lib/data/demo-data";
 import type { DepositScheme, Listing } from "@/lib/types";
 
 /**
@@ -279,6 +279,40 @@ export const demoStore = {
     await save();
   },
 
+  async getListingReviewState(id: string): Promise<"none" | "open" | "rejected"> {
+    const s = await load();
+    const items = s.queue.filter((q) => q.type === "photos" && q.subjectId === id);
+    const latest = items[items.length - 1];
+    if (!latest) return "none";
+    return latest.status === "open" ? "open" : latest.status === "rejected" ? "rejected" : "none";
+  },
+
+  /**
+   * Put a listing back in front of the admin, mirroring what the real backend
+   * does on re-submission. No-op if a photos item is already open. A live
+   * listing keeps its status while the change is re-reviewed.
+   */
+  async resubmitListing(id: string, label: string, toPendingReview: boolean) {
+    const s = await load();
+    if (toPendingReview) {
+      s.listingOverrides[id] = { ...s.listingOverrides[id], status: "pending_review" };
+    }
+    const prior = s.queue.filter((q) => q.type === "photos" && q.subjectId === id);
+    if (!prior.some((q) => q.status === "open")) {
+      s.queue.push({
+        id: `q-${Date.now()}`,
+        type: "photos",
+        subjectId: id,
+        // Keep the label the earlier (rejected) item used so the admin queue
+        // reads the same on the second pass.
+        subjectLabel: prior[prior.length - 1]?.subjectLabel ?? label,
+        status: "open",
+        createdAt: new Date().toISOString(),
+      });
+    }
+    await save();
+  },
+
   async getCreatedListings(landlordId?: string): Promise<Listing[]> {
     const s = await load();
     return landlordId ? s.createdListings.filter((l) => l.landlordId === landlordId) : s.createdListings;
@@ -440,8 +474,21 @@ export const demoStore = {
       }
     }
     if (item.type === "photos") {
-      const listing = s.createdListings.find((l) => l.id === item.subjectId);
-      if (listing) listing.status = resolution === "approved" ? "live" : "draft";
+      // Written through listingOverrides (which layer over seeded listings too,
+      // not just created ones) so the decision reflects wherever the listing
+      // came from. Mirrors the reflect_review_resolution trigger: a listing
+      // that has passed review before stays live when a later change is
+      // rejected — renters keep the version that was approved.
+      const base =
+        s.createdListings.find((l) => l.id === item.subjectId) ??
+        demoListings.find((l) => l.id === item.subjectId);
+      const current = { ...base, ...s.listingOverrides[item.subjectId] };
+      const approvedBefore = current.photosCheckedAt != null;
+      s.listingOverrides[item.subjectId] = {
+        ...s.listingOverrides[item.subjectId],
+        status: resolution === "approved" ? "live" : approvedBefore ? "live" : "draft",
+        ...(resolution === "approved" ? { photosCheckedAt: new Date().toISOString() } : {}),
+      };
     }
     if (item.type === "contract_summary") {
       const summary = s.contractSummaries.find((c) => c.listingId === item.subjectId);

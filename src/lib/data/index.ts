@@ -427,12 +427,39 @@ export async function getMyListings(landlordId: string): Promise<Listing[]> {
 /** Everything a landlord may change after publishing — never the owner or status. */
 export type ListingEdit = Omit<NewListingInput, "landlordId">;
 
+/**
+ * Where the listing stands with the review team, from its latest photos item:
+ * "open" = waiting on an admin, "rejected" = sent back, "none" = approved or
+ * never submitted. Drives what My listings tells the landlord to do next.
+ */
+export type ListingReviewState = "none" | "open" | "rejected";
+
+export async function getListingReviewState(listingId: string): Promise<ListingReviewState> {
+  if (isDemoMode) return demoStore.getListingReviewState(listingId);
+  const { data, error } = await supabase!
+    .from("review_queue")
+    .select("status")
+    .eq("type", "photos")
+    .eq("subject_id", listingId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return "none";
+  return data.status === "open" ? "open" : data.status === "rejected" ? "rejected" : "none";
+}
+
 export async function updateListing(id: string, input: ListingEdit): Promise<void> {
   if (isDemoMode) {
     await demoStore.overrideListing(id, input);
+    const current = await getListing(id);
+    const state = await demoStore.getListingReviewState(id);
+    if (state !== "open" && (current?.status === "draft" || state === "rejected")) {
+      await demoStore.resubmitListing(id, input.title, current?.status !== "live");
+    }
     return;
   }
-  const { error } = await supabase!
+  const { data, error } = await supabase!
     .from("listings")
     .update({
       title: input.title,
@@ -448,8 +475,27 @@ export async function updateListing(id: string, input: ListingEdit): Promise<voi
       available_from: input.availableFrom,
       description: input.description,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("status")
+    .single();
   if (error) throw error;
+
+  // Saving an edit is how a landlord re-submits: after a rejection, or for a
+  // listing that never made it past draft. Without this the listing sits there
+  // with no queue item for an admin to pick up. A listing that is already live
+  // stays live while the change is re-reviewed — same as adding photos to a live
+  // ad — so a rejected edit never pulls the approved version off the market.
+  const state = await getListingReviewState(id);
+  if (state !== "open" && (data.status === "draft" || state === "rejected")) {
+    if (data.status !== "live") {
+      const { error: statusError } = await supabase!
+        .from("listings")
+        .update({ status: "pending_review" })
+        .eq("id", id);
+      if (statusError) throw statusError;
+    }
+    await openReviewItem("photos", id);
+  }
 }
 
 /**

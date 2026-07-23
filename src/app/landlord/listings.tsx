@@ -14,8 +14,10 @@ import {
   archiveListing,
   getApprovedContractSummary,
   getListingPhotos,
+  getListingReviewState,
   getMyListings,
   type ListingPhoto,
+  type ListingReviewState,
   removeListingPhoto,
   submitContract,
 } from "@/lib/data";
@@ -32,12 +34,14 @@ export default function MyListingsScreen() {
   const { session, ready } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [contractStates, setContractStates] = useState<Record<string, ContractState>>({});
+  const [reviewStates, setReviewStates] = useState<Record<string, ListingReviewState>>({});
 
   const refresh = useCallback(() => {
     if (!session) return;
     getMyListings(session.userId).then(async (rows) => {
       setListings(rows);
       const states: Record<string, ContractState> = {};
+      const reviews: Record<string, ListingReviewState> = {};
       for (const listing of rows) {
         if (isDemoMode) {
           const summary = await demoStore.getContractSummary(listing.id);
@@ -46,8 +50,10 @@ export default function MyListingsScreen() {
           const approved = await getApprovedContractSummary(listing.id);
           states[listing.id] = approved ? "approved" : "none";
         }
+        reviews[listing.id] = await getListingReviewState(listing.id).catch(() => "none" as const);
       }
       setContractStates(states);
+      setReviewStates(reviews);
     });
   }, [session]);
 
@@ -80,6 +86,11 @@ export default function MyListingsScreen() {
       }
       renderItem={({ item }) => {
         const contractState = contractStates[item.id] ?? "none";
+        const reviewState = reviewStates[item.id] ?? "none";
+        // A rejection outranks the listing status in the badge: a live listing
+        // whose edit was turned down still needs the landlord to act.
+        const rejected = reviewState === "rejected";
+        const reReviewing = reviewState === "open" && item.status === "live";
         return (
           <View
             style={{
@@ -100,15 +111,35 @@ export default function MyListingsScreen() {
                 style={{
                   fontFamily: fonts.sansBold,
                   fontSize: 12,
-                  color: item.status === "live" ? palette.green : palette.goldInk,
+                  color: rejected ? palette.brick : item.status === "live" ? palette.green : palette.goldInk,
                 }}
               >
-                {statusLabels[item.status] ?? item.status}
+                {rejected
+                  ? t("onboarding.statusRejected")
+                  : (statusLabels[item.status] ?? item.status)}
               </Text>
             </View>
             <Text style={{ fontFamily: fonts.sans, fontSize: 13, color: palette.inkSoft }}>
               £{item.pricePcm}/{t("common.perMonth")} · {item.area}
             </Text>
+            {rejected ? (
+              <View
+                style={{
+                  backgroundColor: palette.redWash,
+                  borderRadius: radius.field,
+                  borderCurve: "continuous",
+                  padding: 12,
+                }}
+              >
+                <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 12.5, lineHeight: 19, color: palette.brickDark }}>
+                  {t("onboarding.listingRejectedHint")}
+                </Text>
+              </View>
+            ) : reReviewing ? (
+              <Text style={{ fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: palette.inkMuted }}>
+                {t("onboarding.listingReReview")}
+              </Text>
+            ) : null}
 
             <ListingActions listing={item} onDeleted={refresh} />
 

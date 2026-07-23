@@ -351,6 +351,8 @@
     "statusSubmitted": "Awaiting review",
     "statusApproved": "Approved ✓",
     "statusRejected": "Rejected — resubmit",
+    "listingRejectedHint": "The team sent this back. Edit the listing and save — that submits it for review again.",
+    "listingReReview": "Your changes are being reviewed. The approved version stays up for renters meanwhile.",
     "myListings": "My listings",
     "newListing": "New listing",
     "editListing": "Edit",
