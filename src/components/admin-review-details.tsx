@@ -4,14 +4,16 @@ import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 
 import { fonts, palette } from "@/constants/theme";
 import { getContractFilePath, getListing, getVerificationDocPaths } from "@/lib/data";
-import type { QueueItem } from "@/lib/data/demo-store";
+import type { OpenedReason, QueueItem } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 import { signedDocUrl } from "@/lib/upload";
 import type { Listing } from "@/lib/types";
 
 /** What the admin needs to SEE before approving: listing details or the uploaded document. */
 export function AdminReviewDetails({ item }: { item: QueueItem }) {
-  if (item.type === "photos") return <ListingPreview listingId={item.subjectId} />;
+  if (item.type === "photos") {
+    return <ListingPreview listingId={item.subjectId} openedReason={item.openedReason} />;
+  }
   if (["identity", "right_to_let", "certificate"].includes(item.type)) {
     return <VerificationDocLink landlordId={item.subjectId} kind={item.type as DocKind} />;
   }
@@ -21,7 +23,20 @@ export function AdminReviewDetails({ item }: { item: QueueItem }) {
 
 type DocKind = "identity" | "right_to_let" | "certificate";
 
-function ListingPreview({ listingId }: { listingId: string }) {
+const reasonKeys: Record<OpenedReason, string> = {
+  new: "admin.reasonNew",
+  photos: "admin.reasonPhotos",
+  edit: "admin.reasonEdit",
+  both: "admin.reasonBoth",
+};
+
+function ListingPreview({
+  listingId,
+  openedReason,
+}: {
+  listingId: string;
+  openedReason: OpenedReason | null;
+}) {
   const { t } = useLang();
   const [listing, setListing] = useState<Listing | null>(null);
 
@@ -33,7 +48,14 @@ function ListingPreview({ listingId }: { listingId: string }) {
 
   return (
     <View style={{ gap: 8 }}>
-      {listing.status === "live" ? (
+      {/* What brought this back to the queue — a price edit must not read as
+          "new photos". Older items carry no reason; fall back to the status. */}
+      {openedReason ? (
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, color: palette.goldInk }}>
+          {t(reasonKeys[openedReason])}
+          {listing.status === "live" ? ` · ${t("admin.stillLive")}` : ""}
+        </Text>
+      ) : listing.status === "live" ? (
         <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, color: palette.green }}>
           {t("admin.liveReReview")}
         </Text>
@@ -46,7 +68,7 @@ function ListingPreview({ listingId }: { listingId: string }) {
         </ScrollView>
       ) : (
         <Text style={{ fontFamily: fonts.sans, fontSize: 12.5, color: palette.inkMuted }}>
-          {t("admin.noDocument")}
+          {t("admin.noPhotos")}
         </Text>
       )}
       <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.ink }}>

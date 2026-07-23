@@ -70,6 +70,9 @@ export type ContractSummary = {
   extracted: ContractExtract;
 };
 
+/** Why a listing review was filed — drives what the admin queue says it is. */
+export type OpenedReason = "new" | "photos" | "edit" | "both";
+
 export type QueueItem = {
   id: string;
   type: "identity" | "right_to_let" | "certificate" | "photos" | "contract_summary";
@@ -77,6 +80,10 @@ export type QueueItem = {
   subjectLabel: string;
   status: "open" | "approved" | "rejected";
   createdAt: string;
+  /** Null on items filed before the column existed. */
+  openedReason: OpenedReason | null;
+  /** The admin's reason, set when rejecting. */
+  resolutionNote: string | null;
 };
 
 type DemoState = {
@@ -176,6 +183,8 @@ function initialState(): DemoState {
         subjectLabel: "Phòng đơn Moss Side — Hùng Trần",
         status: "open",
         createdAt: "2026-07-01T10:00:00Z",
+        openedReason: "new",
+        resolutionNote: null,
       },
     ],
   };
@@ -228,6 +237,8 @@ export const demoStore = {
         subjectId: landlordId,
         subjectLabel: queueLabel,
         status: "open",
+        openedReason: null,
+        resolutionNote: null,
         createdAt: new Date().toISOString(),
       });
     }
@@ -264,6 +275,8 @@ export const demoStore = {
       subjectLabel: queueLabel,
       status: "open",
       createdAt: new Date().toISOString(),
+      openedReason: "new",
+      resolutionNote: null,
     });
     await save();
   },
@@ -279,26 +292,33 @@ export const demoStore = {
     await save();
   },
 
-  async getListingReviewState(id: string): Promise<"none" | "open" | "rejected"> {
+  async getListingReview(
+    id: string,
+  ): Promise<{ state: "none" | "open" | "rejected"; note: string | null }> {
     const s = await load();
     const items = s.queue.filter((q) => q.type === "photos" && q.subjectId === id);
     const latest = items[items.length - 1];
-    if (!latest) return "none";
-    return latest.status === "open" ? "open" : latest.status === "rejected" ? "rejected" : "none";
+    if (!latest) return { state: "none", note: null };
+    const state =
+      latest.status === "open" ? "open" : latest.status === "rejected" ? "rejected" : "none";
+    return { state, note: state === "rejected" ? latest.resolutionNote : null };
   },
 
   /**
    * Put a listing back in front of the admin, mirroring what the real backend
-   * does on re-submission. No-op if a photos item is already open. A live
-   * listing keeps its status while the change is re-reviewed.
+   * does on re-submission. A live listing keeps its status while the change is
+   * re-reviewed. If an item is already open its reason widens to "both".
    */
-  async resubmitListing(id: string, label: string, toPendingReview: boolean) {
+  async resubmitListing(id: string, label: string, toPendingReview: boolean, reason: OpenedReason) {
     const s = await load();
     if (toPendingReview) {
       s.listingOverrides[id] = { ...s.listingOverrides[id], status: "pending_review" };
     }
     const prior = s.queue.filter((q) => q.type === "photos" && q.subjectId === id);
-    if (!prior.some((q) => q.status === "open")) {
+    const open = prior.find((q) => q.status === "open");
+    if (open) {
+      if (open.openedReason && open.openedReason !== reason) open.openedReason = "both";
+    } else {
       s.queue.push({
         id: `q-${Date.now()}`,
         type: "photos",
@@ -308,6 +328,8 @@ export const demoStore = {
         subjectLabel: prior[prior.length - 1]?.subjectLabel ?? label,
         status: "open",
         createdAt: new Date().toISOString(),
+        openedReason: reason,
+        resolutionNote: null,
       });
     }
     await save();
@@ -434,6 +456,8 @@ export const demoStore = {
       subjectId: listingId,
       subjectLabel: listingLabel,
       status: "open",
+      openedReason: null,
+      resolutionNote: null,
       createdAt: new Date().toISOString(),
     });
     await save();
@@ -458,11 +482,12 @@ export const demoStore = {
     return [...s.queue].sort((a, b) => (a.status === "open" ? -1 : 1) - (b.status === "open" ? -1 : 1));
   },
 
-  async resolveQueueItem(id: string, resolution: "approved" | "rejected") {
+  async resolveQueueItem(id: string, resolution: "approved" | "rejected", note?: string) {
     const s = await load();
     const item = s.queue.find((q) => q.id === id);
     if (!item) return;
     item.status = resolution;
+    item.resolutionNote = resolution === "rejected" ? (note?.trim() || null) : null;
 
     // Reflect the decision back onto the subject, like the real backend would.
     if (item.type === "identity" || item.type === "right_to_let" || item.type === "certificate") {

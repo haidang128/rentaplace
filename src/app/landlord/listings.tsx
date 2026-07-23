@@ -14,10 +14,10 @@ import {
   archiveListing,
   getApprovedContractSummary,
   getListingPhotos,
-  getListingReviewState,
+  getListingReview,
   getMyListings,
   type ListingPhoto,
-  type ListingReviewState,
+  type ListingReview,
   removeListingPhoto,
   submitContract,
 } from "@/lib/data";
@@ -34,14 +34,14 @@ export default function MyListingsScreen() {
   const { session, ready } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [contractStates, setContractStates] = useState<Record<string, ContractState>>({});
-  const [reviewStates, setReviewStates] = useState<Record<string, ListingReviewState>>({});
+  const [reviewStates, setReviewStates] = useState<Record<string, ListingReview>>({});
 
   const refresh = useCallback(() => {
     if (!session) return;
     getMyListings(session.userId).then(async (rows) => {
       setListings(rows);
       const states: Record<string, ContractState> = {};
-      const reviews: Record<string, ListingReviewState> = {};
+      const reviews: Record<string, ListingReview> = {};
       for (const listing of rows) {
         if (isDemoMode) {
           const summary = await demoStore.getContractSummary(listing.id);
@@ -50,7 +50,9 @@ export default function MyListingsScreen() {
           const approved = await getApprovedContractSummary(listing.id);
           states[listing.id] = approved ? "approved" : "none";
         }
-        reviews[listing.id] = await getListingReviewState(listing.id).catch(() => "none" as const);
+        reviews[listing.id] = await getListingReview(listing.id).catch(
+          () => ({ state: "none", note: null }) as ListingReview,
+        );
       }
       setContractStates(states);
       setReviewStates(reviews);
@@ -86,11 +88,11 @@ export default function MyListingsScreen() {
       }
       renderItem={({ item }) => {
         const contractState = contractStates[item.id] ?? "none";
-        const reviewState = reviewStates[item.id] ?? "none";
+        const review = reviewStates[item.id] ?? { state: "none", note: null };
         // A rejection outranks the listing status in the badge: a live listing
         // whose edit was turned down still needs the landlord to act.
-        const rejected = reviewState === "rejected";
-        const reReviewing = reviewState === "open" && item.status === "live";
+        const rejected = review.state === "rejected";
+        const reReviewing = review.state === "open" && item.status === "live";
         return (
           <View
             style={{
@@ -131,6 +133,20 @@ export default function MyListingsScreen() {
                   padding: 12,
                 }}
               >
+                {review.note ? (
+                  <Text
+                    selectable
+                    style={{
+                      fontFamily: fonts.sansBold,
+                      fontSize: 13,
+                      lineHeight: 20,
+                      color: palette.brickDark,
+                      marginBottom: 6,
+                    }}
+                  >
+                    “{review.note}”
+                  </Text>
+                ) : null}
                 <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 12.5, lineHeight: 19, color: palette.brickDark }}>
                   {t("onboarding.listingRejectedHint")}
                 </Text>

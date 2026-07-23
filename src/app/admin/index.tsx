@@ -1,10 +1,10 @@
 import { Redirect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 
 import { AdminReviewDetails } from "@/components/admin-review-details";
 import { ContractReviewForm } from "@/components/contract-review-form";
-import { PrimaryButton } from "@/components/form";
+import { LabeledInput, PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
 import { getReviewQueue, resolveReview } from "@/lib/data";
@@ -107,40 +107,100 @@ export default function AdminQueueScreen() {
               }}
             />
           ) : (
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <View style={{ flex: 1 }}>
-                <PrimaryButton
-                  label={t("admin.approve")}
-                  tone="green"
-                  onPress={async () => {
-                    await resolveReview(item.id, "approved");
-                    refresh();
-                  }}
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <PrimaryButton
-                  label={t("admin.reject")}
-                  onPress={async () => {
-                    await resolveReview(item.id, "rejected");
-                    refresh();
-                  }}
-                />
-              </View>
-            </View>
+            <RejectableActions item={item} onResolved={refresh} withApprove />
           )}
 
           {item.type === "contract_summary" ? (
-            <PrimaryButton
-              label={t("admin.reject")}
-              onPress={async () => {
-                await resolveReview(item.id, "rejected");
-                refresh();
-              }}
-            />
+            <RejectableActions item={item} onResolved={refresh} />
           ) : null}
         </View>
       )}
     />
+  );
+}
+
+/**
+ * Approve, and reject-with-a-reason. Rejecting opens an inline box rather than
+ * resolving straight away — the landlord is told to change something, so they
+ * need to know what. The reason is optional but prompted for; Alert.prompt
+ * doesn't exist on web, hence the inline field.
+ */
+function RejectableActions({
+  item,
+  onResolved,
+  withApprove = false,
+}: {
+  item: QueueItem;
+  onResolved: () => void;
+  withApprove?: boolean;
+}) {
+  const { t } = useLang();
+  const [rejecting, setRejecting] = useState(false);
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const resolve = async (resolution: "approved" | "rejected") => {
+    setBusy(true);
+    try {
+      await resolveReview(item.id, resolution, resolution === "rejected" ? note : undefined);
+      onResolved();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (rejecting) {
+    return (
+      <View style={{ gap: 8 }}>
+        <LabeledInput
+          label={t("admin.rejectReasonLabel")}
+          value={note}
+          onChangeText={setNote}
+          placeholder={t("admin.rejectReasonPlaceholder")}
+          multiline
+          numberOfLines={3}
+          style={{ minHeight: 72, textAlignVertical: "top" }}
+        />
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <PrimaryButton
+              label={t("admin.rejectConfirm")}
+              disabled={busy}
+              onPress={() => resolve("rejected")}
+            />
+          </View>
+          <Pressable
+            disabled={busy}
+            onPress={() => {
+              setRejecting(false);
+              setNote("");
+            }}
+            style={{ paddingHorizontal: 14, justifyContent: "center" }}
+          >
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.inkMuted }}>
+              {t("common.cancel")}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flexDirection: "row", gap: 10 }}>
+      {withApprove ? (
+        <View style={{ flex: 1 }}>
+          <PrimaryButton
+            label={t("admin.approve")}
+            tone="green"
+            disabled={busy}
+            onPress={() => resolve("approved")}
+          />
+        </View>
+      ) : null}
+      <View style={{ flex: 1 }}>
+        <PrimaryButton label={t("admin.reject")} disabled={busy} onPress={() => setRejecting(true)} />
+      </View>
+    </View>
   );
 }

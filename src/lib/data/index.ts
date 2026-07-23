@@ -5,6 +5,7 @@ import {
   type ContractExtract,
   type ContractSummary,
   type Conversation,
+  type OpenedReason,
   type QueueItem,
   type Tenancy,
   type VerificationState,
@@ -316,7 +317,7 @@ export async function createListing(input: NewListingInput, landlordLabel: strin
   if (error) throw error;
   const { error: queueError } = await supabase!
     .from("review_queue")
-    .insert({ type: "photos", subject_id: data.id });
+    .insert({ type: "photos", subject_id: data.id, opened_reason: "new" });
   if (queueError) throw queueError;
   return data.id;
 }
@@ -383,7 +384,7 @@ export async function addListingPhotos(listing: Listing, uris: string[]): Promis
   if (listing.status === "live") {
     // Ad stays live; the new photos get re-reviewed alongside it. Dedupe so
     // adding photos one-at-a-time doesn't file the same item several times.
-    await openReviewItem("photos", listing.id);
+    await openReviewItem("photos", listing.id, "photos");
   }
 }
 
@@ -434,28 +435,33 @@ export type ListingEdit = Omit<NewListingInput, "landlordId">;
  */
 export type ListingReviewState = "none" | "open" | "rejected";
 
-export async function getListingReviewState(listingId: string): Promise<ListingReviewState> {
-  if (isDemoMode) return demoStore.getListingReviewState(listingId);
+/** The state plus, when rejected, the admin's reason for the landlord to read. */
+export type ListingReview = { state: ListingReviewState; note: string | null };
+
+export async function getListingReview(listingId: string): Promise<ListingReview> {
+  if (isDemoMode) return demoStore.getListingReview(listingId);
   const { data, error } = await supabase!
     .from("review_queue")
-    .select("status")
+    .select("status, resolution_note")
     .eq("type", "photos")
     .eq("subject_id", listingId)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (error) throw error;
-  if (!data) return "none";
-  return data.status === "open" ? "open" : data.status === "rejected" ? "rejected" : "none";
+  if (!data) return { state: "none", note: null };
+  const state: ListingReviewState =
+    data.status === "open" ? "open" : data.status === "rejected" ? "rejected" : "none";
+  return { state, note: state === "rejected" ? (data.resolution_note ?? null) : null };
 }
 
 export async function updateListing(id: string, input: ListingEdit): Promise<void> {
   if (isDemoMode) {
     await demoStore.overrideListing(id, input);
     const current = await getListing(id);
-    const state = await demoStore.getListingReviewState(id);
+    const { state } = await demoStore.getListingReview(id);
     if (state !== "open" && (current?.status === "draft" || state === "rejected")) {
-      await demoStore.resubmitListing(id, input.title, current?.status !== "live");
+      await demoStore.resubmitListing(id, input.title, current?.status !== "live", "edit");
     }
     return;
   }
@@ -485,7 +491,7 @@ export async function updateListing(id: string, input: ListingEdit): Promise<voi
   // with no queue item for an admin to pick up. A listing that is already live
   // stays live while the change is re-reviewed — same as adding photos to a live
   // ad — so a rejected edit never pulls the approved version off the market.
-  const state = await getListingReviewState(id);
+  const { state } = await getListingReview(id);
   if (state !== "open" && (data.status === "draft" || state === "rejected")) {
     if (data.status !== "live") {
       const { error: statusError } = await supabase!
@@ -494,7 +500,7 @@ export async function updateListing(id: string, input: ListingEdit): Promise<voi
         .eq("id", id);
       if (statusError) throw statusError;
     }
-    await openReviewItem("photos", id);
+    await openReviewItem("photos", id, "edit");
   }
 }
 
@@ -537,16 +543,30 @@ export async function toggleSaved(userId: string | null, listingId: string, save
  * guard; the pre-check just avoids a noisy error on the common path, and we
  * swallow the unique-violation (23505) that a concurrent insert would raise.
  */
-async function openReviewItem(type: QueueItem["type"], subjectId: string): Promise<void> {
+async function openReviewItem(
+  type: QueueItem["type"],
+  subjectId: string,
+  reason?: OpenedReason,
+): Promise<void> {
   const { data: existing } = await supabase!
     .from("review_queue")
-    .select("id")
+    .select("id, opened_reason")
     .eq("type", type)
     .eq("subject_id", subjectId)
     .eq("status", "open")
     .maybeSingle();
-  if (existing) return;
-  const { error } = await supabase!.from("review_queue").insert({ type, subject_id: subjectId });
+  if (existing) {
+    // Already queued. If this change is of a different kind than the one that
+    // filed it, widen the reason so the admin isn't told "new photos" when the
+    // price moved too.
+    if (reason && existing.opened_reason && existing.opened_reason !== reason) {
+      await supabase!.from("review_queue").update({ opened_reason: "both" }).eq("id", existing.id);
+    }
+    return;
+  }
+  const { error } = await supabase!
+    .from("review_queue")
+    .insert({ type, subject_id: subjectId, opened_reason: reason ?? null });
   if (error && error.code !== "23505") throw error;
 }
 
@@ -554,7 +574,7 @@ export async function getReviewQueue(): Promise<QueueItem[]> {
   if (isDemoMode) return demoStore.getQueue();
   const { data, error } = await supabase!
     .from("review_queue")
-    .select("id, type, subject_id, status, created_at")
+    .select("id, type, subject_id, status, created_at, opened_reason, resolution_note")
     .order("created_at", { ascending: true });
   if (error) throw error;
 
@@ -590,17 +610,27 @@ export async function getReviewQueue(): Promise<QueueItem[]> {
     subjectLabel: labels.get(r.subject_id) ?? r.subject_id,
     status: r.status === "open" ? "open" : r.status,
     createdAt: r.created_at,
+    openedReason: r.opened_reason ?? null,
+    resolutionNote: r.resolution_note ?? null,
   }));
 }
 
-export async function resolveReview(id: string, resolution: "approved" | "rejected"): Promise<void> {
+export async function resolveReview(
+  id: string,
+  resolution: "approved" | "rejected",
+  note?: string,
+): Promise<void> {
   if (isDemoMode) {
-    await demoStore.resolveQueueItem(id, resolution);
+    await demoStore.resolveQueueItem(id, resolution, note);
     return;
   }
   const { error } = await supabase!
     .from("review_queue")
-    .update({ status: resolution, resolved_at: new Date().toISOString() })
+    .update({
+      status: resolution,
+      resolved_at: new Date().toISOString(),
+      resolution_note: resolution === "rejected" ? (note?.trim() || null) : null,
+    })
     .eq("id", id);
   if (error) throw error;
 }
