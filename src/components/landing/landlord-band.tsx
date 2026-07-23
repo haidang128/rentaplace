@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { Link } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
 import { Seal } from "@/components/seal";
 import { fonts, palette } from "@/constants/theme";
@@ -71,20 +72,48 @@ export function LandlordBand({ isDesktop }: { isDesktop: boolean }) {
               </View>
             ))}
           </View>
+          {/* Signed-out or renter visitors land on the profile screen, which is
+              where sign-in and "become a landlord" live. */}
           <View
             style={{
+              flexDirection: isDesktop ? "row" : "column",
+              gap: 12,
               alignSelf: isDesktop ? "flex-start" : "stretch",
-              paddingHorizontal: 26,
-              paddingVertical: 15,
-              borderRadius: 14,
-              borderCurve: "continuous",
-              backgroundColor: palette.gold,
-              alignItems: "center",
             }}
           >
-            <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 15.5, color: palette.brown }}>
-              {t("landing.landlordBand.cta")}
-            </Text>
+            <Link href="/landlord/new-listing" asChild>
+              <Pressable
+                style={{
+                  paddingHorizontal: 26,
+                  paddingVertical: 15,
+                  borderRadius: 14,
+                  borderCurve: "continuous",
+                  backgroundColor: palette.gold,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontFamily: fonts.sansExtraBold, fontSize: 15.5, color: palette.brown }}>
+                  {t("landing.landlordBand.cta")}
+                </Text>
+              </Pressable>
+            </Link>
+            <Link href="/landlord/verification" asChild>
+              <Pressable
+                style={{
+                  paddingHorizontal: 26,
+                  paddingVertical: 15,
+                  borderRadius: 14,
+                  borderCurve: "continuous",
+                  borderWidth: 1.5,
+                  borderColor: palette.brownBorder,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 15.5, color: palette.brownTextHi }}>
+                  {t("landing.landlordBand.ctaSecondary")}
+                </Text>
+              </Pressable>
+            </Link>
           </View>
         </View>
 

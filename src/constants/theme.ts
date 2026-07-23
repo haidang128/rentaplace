@@ -25,6 +25,7 @@ export const palette = {
   brown: "#33241C",
   brownCard: "#3E2C21",
   brownLine: "#57422F",
+  brownBorder: "#6B5744",
   brownText: "#C9B9A6",
   brownTextHi: "#EADFCF",
 } as const;
