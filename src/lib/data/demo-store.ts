@@ -292,6 +292,21 @@ export const demoStore = {
     await save();
   },
 
+  async getVerificationRejectionNotes(
+    landlordId: string,
+  ): Promise<Partial<Record<"identity" | "right_to_let" | "certificate", string>>> {
+    const s = await load();
+    const notes: Partial<Record<"identity" | "right_to_let" | "certificate", string>> = {};
+    for (const q of s.queue) {
+      if (q.subjectId !== landlordId) continue;
+      if (q.type !== "identity" && q.type !== "right_to_let" && q.type !== "certificate") continue;
+      // Later items win, so a re-submission clears a stale rejection note.
+      if (q.status === "rejected" && q.resolutionNote) notes[q.type] = q.resolutionNote;
+      else delete notes[q.type];
+    }
+    return notes;
+  },
+
   async getListingReview(
     id: string,
   ): Promise<{ state: "none" | "open" | "rejected"; note: string | null }> {

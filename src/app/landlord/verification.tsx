@@ -12,6 +12,7 @@ import {
   declareScheme,
   getLandlordPhone,
   getMyVerification,
+  getVerificationRejectionNotes,
   setLandlordPhone,
   submitVerificationDoc,
 } from "@/lib/data";
@@ -44,12 +45,16 @@ export default function VerificationScreen() {
   const [uploadingKind, setUploadingKind] = useState<DocKind | null>(null);
   const [phone, setPhone] = useState("");
   const [savingPhone, setSavingPhone] = useState(false);
+  const [rejectionNotes, setRejectionNotes] = useState<Partial<Record<DocKind, string>>>({});
   const { notice, showSuccess, showError, clearNotice } = useNotice();
 
   const refresh = useCallback(() => {
     if (session) {
       getMyVerification(session.userId).then(setState);
       getLandlordPhone(session.userId).then((p) => setPhone(p ?? ""));
+      getVerificationRejectionNotes(session.userId)
+        .then(setRejectionNotes)
+        .catch(() => setRejectionNotes({}));
     }
   }, [session]);
 
@@ -169,6 +174,7 @@ export default function VerificationScreen() {
             ? undefined
             : () => pickAndSubmit("identity")
         }
+        rejectionNote={rejectionNotes.identity}
       />
       <DocCard
         title={t("onboarding.rightToLetTitle")}
@@ -183,6 +189,7 @@ export default function VerificationScreen() {
             ? undefined
             : () => pickAndSubmit("right_to_let")
         }
+        rejectionNote={rejectionNotes.right_to_let}
       />
 
       {/* Deposit pledge: declare scheme (tier 1), then certificate (tier 2) */}
@@ -216,6 +223,7 @@ export default function VerificationScreen() {
             ? undefined
             : () => pickAndSubmit("certificate")
         }
+        rejectionNote={rejectionNotes.certificate}
       />
     </ScrollView>
   );
@@ -242,6 +250,7 @@ function DocCard({
   onAction,
   fileName,
   uploadedLabel,
+  rejectionNote,
 }: {
   title: string;
   body: string;
@@ -251,7 +260,11 @@ function DocCard({
   onAction?: () => void;
   fileName?: string;
   uploadedLabel?: string;
+  /** The admin's reason, when this doc was turned down. */
+  rejectionNote?: string;
 }) {
+  const { t } = useLang();
+
   return (
     <View style={cardStyle}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -259,6 +272,34 @@ function DocCard({
         <Text style={{ fontFamily: fonts.sansBold, fontSize: 12.5, color: statusColor }}>{status}</Text>
       </View>
       <Text style={bodyStyle}>{body}</Text>
+      {rejectionNote ? (
+        <View
+          style={{
+            backgroundColor: palette.redWash,
+            borderRadius: radius.field,
+            borderCurve: "continuous",
+            padding: 12,
+          }}
+        >
+          <Text
+            selectable
+            style={{ fontFamily: fonts.sansBold, fontSize: 13, lineHeight: 20, color: palette.brickDark }}
+          >
+            “{rejectionNote}”
+          </Text>
+          <Text
+            style={{
+              fontFamily: fonts.sansSemiBold,
+              fontSize: 12.5,
+              lineHeight: 19,
+              color: palette.brickDark,
+              marginTop: 6,
+            }}
+          >
+            {t("onboarding.docRejectedHint")}
+          </Text>
+        </View>
+      ) : null}
       {fileName && uploadedLabel ? (
         <Text
           numberOfLines={1}

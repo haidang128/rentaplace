@@ -438,6 +438,34 @@ export type ListingReviewState = "none" | "open" | "rejected";
 /** The state plus, when rejected, the admin's reason for the landlord to read. */
 export type ListingReview = { state: ListingReviewState; note: string | null };
 
+export type VerificationDocKind = "identity" | "right_to_let" | "certificate";
+
+/**
+ * The admin's reason for each rejected verification doc, so the landlord knows
+ * what to fix before re-uploading. Keyed by doc kind; absent when the latest
+ * item for that kind wasn't a rejection.
+ */
+export async function getVerificationRejectionNotes(
+  landlordId: string,
+): Promise<Partial<Record<VerificationDocKind, string>>> {
+  if (isDemoMode) return demoStore.getVerificationRejectionNotes(landlordId);
+  const { data, error } = await supabase!
+    .from("review_queue")
+    .select("type, status, resolution_note, created_at")
+    .eq("subject_id", landlordId)
+    .in("type", ["identity", "right_to_let", "certificate"])
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  const notes: Partial<Record<VerificationDocKind, string>> = {};
+  for (const row of data as any[]) {
+    // Ascending order: the last row for a kind wins, and a later re-submission
+    // that hasn't been rejected clears the stale note.
+    if (row.status === "rejected" && row.resolution_note) notes[row.type as VerificationDocKind] = row.resolution_note;
+    else delete notes[row.type as VerificationDocKind];
+  }
+  return notes;
+}
+
 export async function getListingReview(listingId: string): Promise<ListingReview> {
   if (isDemoMode) return demoStore.getListingReview(listingId);
   const { data, error } = await supabase!
