@@ -484,14 +484,18 @@ export async function getListingReview(listingId: string): Promise<ListingReview
   return { state, note: state === "rejected" ? (data.resolution_note ?? null) : null };
 }
 
+/**
+ * A let or archived listing is off the market, so editing one is bookkeeping —
+ * it does not need a reviewer and must not reopen the queue.
+ */
+const editableStatuses: string[] = ["draft", "pending_review", "live"];
+
 export async function updateListing(id: string, input: ListingEdit): Promise<void> {
   if (isDemoMode) {
     await demoStore.overrideListing(id, input);
     const current = await getListing(id);
-    const { state } = await demoStore.getListingReview(id);
-    if (state !== "open" && (current?.status === "draft" || state === "rejected")) {
-      await demoStore.resubmitListing(id, input.title, current?.status !== "live", "edit");
-    }
+    if (current && !editableStatuses.includes(current.status)) return;
+    await demoStore.resubmitListing(id, input.title, current?.status !== "live", "edit");
     return;
   }
   const { data, error } = await supabase!
@@ -515,22 +519,25 @@ export async function updateListing(id: string, input: ListingEdit): Promise<voi
     .single();
   if (error) throw error;
 
-  // Saving an edit is how a landlord re-submits: after a rejection, or for a
-  // listing that never made it past draft. Without this the listing sits there
-  // with no queue item for an admin to pick up. A listing that is already live
-  // stays live while the change is re-reviewed — same as adding photos to a live
-  // ad — so a rejected edit never pulls the approved version off the market.
-  const { state } = await getListingReview(id);
-  if (state !== "open" && (data.status === "draft" || state === "rejected")) {
-    if (data.status !== "live") {
-      const { error: statusError } = await supabase!
-        .from("listings")
-        .update({ status: "pending_review" })
-        .eq("id", id);
-      if (statusError) throw statusError;
-    }
-    await openReviewItem("photos", id, "edit");
+  // Every edit goes back to the review team. The seal promises a human checked
+  // what renters see, and the price, the deposit and the description are part of
+  // that — an edit that never reached the queue made the promise untrue for any
+  // listing after its first approval.
+  //
+  // A live ad stays live while the change is re-reviewed, exactly as adding
+  // photos to a live ad already behaves: pulling an approved listing off the
+  // market because its owner fixed a typo would punish the wrong thing.
+  // openReviewItem dedupes, and widens the reason to "both" when an item is
+  // already open for new photos.
+  if (!editableStatuses.includes(data.status)) return;
+  if (data.status !== "live") {
+    const { error: statusError } = await supabase!
+      .from("listings")
+      .update({ status: "pending_review" })
+      .eq("id", id);
+    if (statusError) throw statusError;
   }
+  await openReviewItem("photos", id, "edit");
 }
 
 /**
