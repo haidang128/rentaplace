@@ -430,6 +430,7 @@
     "fieldTermPeriodic": "Periodic tenancy (no fixed term)",
     "fieldLodger": "Lodger agreement (live-in landlord)",
     "fieldClauses": "Unusual clauses (one per line, leave empty if none)",
-    "saveApprove": "Save + Approve"
+    "saveApprove": "Save + Approve",
+    "deposit": "Deposit"
   }
 }

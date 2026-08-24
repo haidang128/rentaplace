@@ -72,7 +72,7 @@ function ListingPreview({
         </Text>
       )}
       <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.ink }}>
-        £{listing.pricePcm}/{t("common.perMonth")} · {t("listingForm.fieldDeposit")} £{listing.depositAmount} ·{" "}
+        £{listing.pricePcm}/{t("common.perMonth")} · {t("admin.deposit")} £{listing.depositAmount} ·{" "}
         {listing.area}, {listing.city}
       </Text>
       {listing.liveInLandlord ? (

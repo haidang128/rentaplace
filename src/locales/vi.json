@@ -430,6 +430,7 @@
     "fieldTermPeriodic": "Hợp đồng định kỳ (không thời hạn cố định)",
     "fieldLodger": "Hợp đồng lodger (chủ nhà sống cùng)",
     "fieldClauses": "Điều khoản bất thường (mỗi dòng một mục, để trống nếu không có)",
-    "saveApprove": "Lưu + Duyệt"
+    "saveApprove": "Lưu + Duyệt",
+    "deposit": "Tiền cọc"
   }
 }
