@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
+import { ReportBlock } from "@/components/report-block";
 import { ContactActions } from "@/components/contact-actions";
 import { Seal } from "@/components/seal";
 import { TrustChip } from "@/components/trust-chip";
@@ -188,6 +189,7 @@ export default function LandlordProfileScreen() {
           ))}
         </>
       ) : null}
+      <ReportBlock targetType="user" targetId={landlord.id} blockId={landlord.id} blockLabel={landlord.displayName} />
       <View style={{ height: 24 }} />
     </ScrollView>
   );

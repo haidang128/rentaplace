@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { LabeledInput, PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
+import { BlockedList } from "@/components/blocked-list";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
 import { useLang } from "@/lib/i18n";
@@ -60,6 +61,8 @@ export default function ProfileScreen() {
           {session.role === "renter" ? <MenuLink href="/tenancy" label={t("tenancy.menuLink")} /> : null}
           <MenuLink href="/handbook" label={t("handbook.title")} />
           {session.role === "renter" && !isDemoMode ? <BecomeLandlord /> : null}
+
+          <BlockedList />
 
           <Pressable onPress={signOut} style={{ paddingVertical: 10 }}>
             <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 14, color: palette.brick }}>

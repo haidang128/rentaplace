@@ -988,3 +988,100 @@ export async function joinWaitlist(entry: {
   if (error) throw error;
   return { ok: true };
 }
+
+// ── Reporting and blocking (App Store Guideline 1.2) ────────────────────────
+
+export type ReportTarget = "listing" | "conversation" | "review" | "user";
+
+/**
+ * File a report for an admin to look at. Reports are write-and-forget from the
+ * reporter's side: they can read their own back, but resolution happens in the
+ * admin queue.
+ */
+export async function reportContent(
+  reporterId: string,
+  targetType: ReportTarget,
+  targetId: string,
+  reason: string,
+): Promise<void> {
+  if (isDemoMode) return demoStore.reportContent(reporterId, targetType, targetId, reason);
+  const { error } = await supabase!.from("content_reports").insert({
+    reporter_id: reporterId,
+    target_type: targetType,
+    target_id: targetId,
+    reason: reason.trim(),
+  });
+  if (error) throw error;
+}
+
+export async function blockUser(blockerId: string, blockedId: string): Promise<void> {
+  if (isDemoMode) return demoStore.blockUser(blockerId, blockedId);
+  // Blocking twice is not an error — the pair is the primary key.
+  const { error } = await supabase!
+    .from("user_blocks")
+    .upsert({ blocker_id: blockerId, blocked_id: blockedId }, { onConflict: "blocker_id,blocked_id" });
+  if (error) throw error;
+}
+
+export async function unblockUser(blockerId: string, blockedId: string): Promise<void> {
+  if (isDemoMode) return demoStore.unblockUser(blockerId, blockedId);
+  const { error } = await supabase!
+    .from("user_blocks")
+    .delete()
+    .eq("blocker_id", blockerId)
+    .eq("blocked_id", blockedId);
+  if (error) throw error;
+}
+
+/**
+ * Who this user has blocked. Only the blocker's own rows are readable — the
+ * blocked party must not be able to tell — so this is the list to hide threads
+ * with. The database still refuses the message either way.
+ */
+export async function getBlockedIds(userId: string): Promise<string[]> {
+  if (isDemoMode) return demoStore.getBlockedIds(userId);
+  const { data, error } = await supabase!
+    .from("user_blocks")
+    .select("blocked_id")
+    .eq("blocker_id", userId);
+  if (error) throw error;
+  return data.map((r: any) => r.blocked_id);
+}
+
+export type ContentReport = {
+  id: string;
+  reporterId: string;
+  targetType: ReportTarget;
+  targetId: string;
+  reason: string;
+  createdAt: string;
+};
+
+/** Open reports for the admin queue. Reporting is only half of Guideline 1.2 —
+ *  someone has to be able to act on what comes in. */
+export async function getOpenReports(): Promise<ContentReport[]> {
+  if (isDemoMode) return demoStore.getOpenReports();
+  const { data, error } = await supabase!
+    .from("content_reports")
+    .select("id, reporter_id, target_type, target_id, reason, created_at")
+    .is("resolved_at", null)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    reporterId: r.reporter_id,
+    targetType: r.target_type,
+    targetId: r.target_id,
+    reason: r.reason,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function resolveReport(id: string, reviewerId: string): Promise<void> {
+  if (isDemoMode) return demoStore.resolveReport(id);
+  const { error } = await supabase!
+    .from("content_reports")
+    .update({ resolved_at: new Date().toISOString(), resolved_by: reviewerId })
+    .eq("id", id);
+  if (error) throw error;
+}

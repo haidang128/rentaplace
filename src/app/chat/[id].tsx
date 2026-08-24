@@ -1,7 +1,8 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { FlatList, KeyboardAvoidingView, Pressable, Text, TextInput, View } from "react-native";
 
+import { ReportBlock } from "@/components/report-block";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
 import { getConversations, getMessages, sendMessage, subscribeToMessages } from "@/lib/data";
@@ -72,6 +73,18 @@ export default function ChatThreadScreen() {
         <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 12, lineHeight: 18, color: palette.goldInk }}>
           {t("chat.safetyBanner")}
         </Text>
+      </View>
+
+      {/* Guideline 1.2: reporting and blocking have to be reachable from the
+          conversation itself, not buried in a settings screen. */}
+      <View style={{ paddingHorizontal: 16 }}>
+        <ReportBlock
+          targetType="conversation"
+          targetId={id}
+          blockId={conversation ? (conversation.renterId === session.userId ? conversation.landlordId : conversation.renterId) : undefined}
+          blockLabel={conversation ? (conversation.renterId === session.userId ? conversation.landlordName : conversation.renterName) : undefined}
+          onBlocked={() => router.back()}
+        />
       </View>
 
       <FlatList

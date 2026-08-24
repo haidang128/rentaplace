@@ -99,6 +99,9 @@ type DemoState = {
   landlordPhones: Record<string, string>;
   /** Edits and archives layered over both seeded and created listings. */
   listingOverrides: Record<string, Partial<Listing>>;
+  /** Guideline 1.2: reports an admin reviews, and each user's own block list. */
+  reports: { id: string; reporterId: string; targetType: string; targetId: string; reason: string; createdAt: string }[];
+  blocks: { blockerId: string; blockedId: string }[];
 };
 
 const STORAGE_KEY = "rentaplace.demo-state.v1";
@@ -122,6 +125,8 @@ function initialState(): DemoState {
     },
     createdListings: [],
     listingOverrides: {},
+    reports: [],
+    blocks: [],
     savedIds: [],
     tenancies: [],
     extraReviews: [],
@@ -495,6 +500,56 @@ export const demoStore = {
   async getQueue(): Promise<QueueItem[]> {
     const s = await load();
     return [...s.queue].sort((a, b) => (a.status === "open" ? -1 : 1) - (b.status === "open" ? -1 : 1));
+  },
+
+  async reportContent(reporterId: string, targetType: string, targetId: string, reason: string) {
+    const s = await load();
+    s.reports.push({
+      id: `r-${Date.now()}`,
+      reporterId,
+      targetType,
+      targetId,
+      reason: reason.trim(),
+      createdAt: new Date().toISOString(),
+    });
+    await save();
+  },
+
+  async getOpenReports() {
+    const s = await load();
+    return s.reports.map((r) => ({
+      id: r.id,
+      reporterId: r.reporterId,
+      targetType: r.targetType as "listing" | "conversation" | "review" | "user",
+      targetId: r.targetId,
+      reason: r.reason,
+      createdAt: r.createdAt,
+    }));
+  },
+
+  async resolveReport(id: string) {
+    const s = await load();
+    s.reports = s.reports.filter((r) => r.id !== id);
+    await save();
+  },
+
+  async blockUser(blockerId: string, blockedId: string) {
+    const s = await load();
+    if (!s.blocks.some((b) => b.blockerId === blockerId && b.blockedId === blockedId)) {
+      s.blocks.push({ blockerId, blockedId });
+      await save();
+    }
+  },
+
+  async unblockUser(blockerId: string, blockedId: string) {
+    const s = await load();
+    s.blocks = s.blocks.filter((b) => !(b.blockerId === blockerId && b.blockedId === blockedId));
+    await save();
+  },
+
+  async getBlockedIds(userId: string): Promise<string[]> {
+    const s = await load();
+    return s.blocks.filter((b) => b.blockerId === userId).map((b) => b.blockedId);
   },
 
   async resolveQueueItem(id: string, resolution: "approved" | "rejected", note?: string) {

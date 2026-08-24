@@ -431,6 +431,32 @@
     "fieldLodger": "Hợp đồng lodger (chủ nhà sống cùng)",
     "fieldClauses": "Điều khoản bất thường (mỗi dòng một mục, để trống nếu không có)",
     "saveApprove": "Lưu + Duyệt",
-    "deposit": "Tiền cọc"
+    "deposit": "Tiền cọc",
+    "reportsTitle": "NỘI DUNG BỊ BÁO CÁO",
+    "reportsEmpty": "Không có báo cáo nào.",
+    "reportOn": "Báo cáo về {{type}}",
+    "reportBy": "Người báo cáo",
+    "markHandled": "Đã xử lý",
+    "noReason": "(không nêu lý do)"
+  },
+  "safety": {
+    "reportLink": "Báo cáo hoặc chặn",
+    "reportTitle": "Báo cáo cho đội ngũ của chúng tôi",
+    "reasonLabel": "Có vấn đề gì? (không bắt buộc)",
+    "reasonPlaceholder": "ví dụ: Đòi tiền cọc trước khi cho xem phòng",
+    "reportSubmit": "Gửi báo cáo",
+    "reportSent": "Cảm ơn bạn — đội ngũ của chúng tôi sẽ xem xét.",
+    "reportFailed": "Không gửi được báo cáo. Vui lòng thử lại.",
+    "blockLink": "Chặn người này",
+    "blockConfirmTitle": "Chặn {{name}}?",
+    "blockConfirmBody": "Họ sẽ không thể nhắn tin cho bạn, và cuộc trò chuyện này biến mất khỏi danh sách. Bạn có thể bỏ chặn trong trang cá nhân.",
+    "blockConfirm": "Chặn",
+    "blocked": "Đã chặn. Họ không thể nhắn tin cho bạn nữa.",
+    "blockFailed": "Không chặn được. Vui lòng thử lại.",
+    "blockedTitle": "Những người đã chặn",
+    "blockedEmpty": "Bạn chưa chặn ai.",
+    "unblock": "Bỏ chặn",
+    "unblocked": "Đã bỏ chặn.",
+    "signInToReport": "Đăng nhập ở tab Trang cá nhân để báo cáo."
   }
 }

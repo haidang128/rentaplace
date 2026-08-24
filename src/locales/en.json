@@ -431,6 +431,32 @@
     "fieldLodger": "Lodger agreement (live-in landlord)",
     "fieldClauses": "Unusual clauses (one per line, leave empty if none)",
     "saveApprove": "Save + Approve",
-    "deposit": "Deposit"
+    "deposit": "Deposit",
+    "reportsTitle": "REPORTED CONTENT",
+    "reportsEmpty": "No open reports.",
+    "reportOn": "Report on {{type}}",
+    "reportBy": "Reported by",
+    "markHandled": "Mark handled",
+    "noReason": "(no reason given)"
+  },
+  "safety": {
+    "reportLink": "Report or block",
+    "reportTitle": "Report this to our team",
+    "reasonLabel": "What is wrong? (optional)",
+    "reasonPlaceholder": "e.g. Asked for a deposit before any viewing",
+    "reportSubmit": "Send report",
+    "reportSent": "Thank you — our team will look at this.",
+    "reportFailed": "Could not send the report. Please try again.",
+    "blockLink": "Block this person",
+    "blockConfirmTitle": "Block {{name}}?",
+    "blockConfirmBody": "They will not be able to message you, and this conversation disappears from your list. You can undo this from your profile.",
+    "blockConfirm": "Block",
+    "blocked": "Blocked. They can no longer message you.",
+    "blockFailed": "Could not block. Please try again.",
+    "blockedTitle": "Blocked people",
+    "blockedEmpty": "You have not blocked anyone.",
+    "unblock": "Unblock",
+    "unblocked": "Unblocked.",
+    "signInToReport": "Sign in on the Profile tab to report this."
   }
 }

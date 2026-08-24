@@ -3,6 +3,7 @@ import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 
+import { ReportBlock } from "@/components/report-block";
 import { ContactActions } from "@/components/contact-actions";
 import { PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
@@ -268,6 +269,12 @@ export default function ListingDetailScreen() {
               </Pressable>
             </Link>
           ) : null}
+        </View>
+
+        {/* Guideline 1.2: every piece of user-generated content needs a way to
+            report it, listings included. */}
+        <View style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
+          <ReportBlock targetType="listing" targetId={listing.id} />
         </View>
       </ScrollView>
 

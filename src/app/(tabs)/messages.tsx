@@ -4,7 +4,7 @@ import { FlatList, Pressable, Text, View } from "react-native";
 
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { getConversations } from "@/lib/data";
+import { getBlockedIds, getConversations } from "@/lib/data";
 import type { Conversation } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 
@@ -15,8 +15,25 @@ export default function MessagesScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (session) getConversations(session.userId).then(setConversations);
-      else setConversations([]);
+      if (!session) {
+        setConversations([]);
+        return;
+      }
+      // A blocked person's thread disappears from the list. The database also
+      // refuses their messages, so this is presentation, not the enforcement.
+      // getBlockedIds tolerates a missing table: the web build deploys on push
+      // while migrations are applied by hand, so a brief window exists where the
+      // block list is unavailable. Failing soft shows every thread; failing hard
+      // would show none.
+      Promise.all([
+        getConversations(session.userId),
+        getBlockedIds(session.userId).catch(() => [] as string[]),
+      ]).then(
+        ([rows, blocked]) =>
+          setConversations(
+            rows.filter((c) => !blocked.includes(c.renterId) && !blocked.includes(c.landlordId)),
+          ),
+      );
     }, [session]),
   );
 

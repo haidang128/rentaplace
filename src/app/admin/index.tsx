@@ -7,7 +7,7 @@ import { ContractReviewForm } from "@/components/contract-review-form";
 import { LabeledInput, PrimaryButton } from "@/components/form";
 import { fonts, palette, radius } from "@/constants/theme";
 import { useAuth } from "@/lib/auth";
-import { getReviewQueue, resolveReview } from "@/lib/data";
+import { getOpenReports, getReviewQueue, resolveReport, resolveReview, type ContentReport } from "@/lib/data";
 import type { QueueItem } from "@/lib/data/demo-store";
 import { useLang } from "@/lib/i18n";
 
@@ -23,9 +23,11 @@ export default function AdminQueueScreen() {
   const { t } = useLang();
   const { session, ready } = useAuth();
   const [items, setItems] = useState<QueueItem[]>([]);
+  const [reports, setReports] = useState<ContentReport[]>([]);
 
   const refresh = useCallback(() => {
     getReviewQueue().then(setItems);
+    getOpenReports().then(setReports).catch(() => setReports([]));
   }, []);
 
   useEffect(refresh, [refresh]);
@@ -51,7 +53,9 @@ export default function AdminQueueScreen() {
         <Text style={{ fontFamily: fonts.sans, fontSize: 15, color: palette.inkMuted }}>{t("admin.empty")}</Text>
       }
       ListFooterComponent={
-        resolved.length > 0 ? (
+        <>
+          <ReportsSection reports={reports} onResolved={refresh} reviewerId={session?.userId ?? ""} />
+          {resolved.length > 0 ? (
           <View style={{ gap: 8, paddingTop: 16 }}>
             <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, letterSpacing: 0.8, color: palette.inkMuted }}>
               {t("admin.resolved").toUpperCase()}
@@ -73,7 +77,8 @@ export default function AdminQueueScreen() {
               </View>
             ))}
           </View>
-        ) : null
+          ) : null}
+        </>
       }
       renderItem={({ item }) => (
         <View
@@ -201,6 +206,63 @@ function RejectableActions({
       <View style={{ flex: 1 }}>
         <PrimaryButton label={t("admin.reject")} disabled={busy} onPress={() => setRejecting(true)} />
       </View>
+    </View>
+  );
+}
+
+/**
+ * Reported listings, conversations, reviews and people. Guideline 1.2 asks for
+ * a report mechanism *and* a timely response, so the reports have to surface
+ * somewhere a human actually looks — here, alongside the verification queue.
+ */
+function ReportsSection({
+  reports,
+  onResolved,
+  reviewerId,
+}: {
+  reports: ContentReport[];
+  onResolved: () => void;
+  reviewerId: string;
+}) {
+  const { t } = useLang();
+  if (reports.length === 0) return null;
+
+  return (
+    <View style={{ gap: 8, paddingTop: 20 }}>
+      <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, letterSpacing: 0.8, color: palette.brick }}>
+        {t("admin.reportsTitle")}
+      </Text>
+      {reports.map((r) => (
+        <View
+          key={r.id}
+          style={{
+            backgroundColor: "#fff",
+            borderWidth: 1,
+            borderColor: palette.brick,
+            borderRadius: radius.card,
+            borderCurve: "continuous",
+            padding: 14,
+            gap: 8,
+          }}
+        >
+          <Text style={{ fontFamily: fonts.sansBold, fontSize: 12, color: palette.brickDark }}>
+            {t("admin.reportOn", { type: r.targetType })}
+          </Text>
+          <Text selectable style={{ fontFamily: fonts.sans, fontSize: 13.5, lineHeight: 20, color: palette.ink }}>
+            {r.reason || t("admin.noReason")}
+          </Text>
+          <Text style={{ fontFamily: fonts.sans, fontSize: 11.5, color: palette.inkMuted }}>
+            {r.targetId}
+          </Text>
+          <PrimaryButton
+            label={t("admin.markHandled")}
+            onPress={async () => {
+              await resolveReport(r.id, reviewerId);
+              onResolved();
+            }}
+          />
+        </View>
+      ))}
     </View>
   );
 }
