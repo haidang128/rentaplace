@@ -177,7 +177,7 @@ function DemoSignIn() {
 
 function EmailPasswordSignIn() {
   const { t } = useLang();
-  const { signInWithPassword, resendConfirmation } = useAuth();
+  const { signInWithPassword, requestPasswordReset, resendConfirmation } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -186,6 +186,10 @@ function EmailPasswordSignIn() {
   // happens once "Confirm email" is enabled in Supabase).
   const [awaitingEmail, setAwaitingEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  // Forgot-password sub-form. Kept inline rather than on its own route so the
+  // email already typed above carries straight over.
+  const [forgot, setForgot] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const submit = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -252,9 +256,15 @@ function EmailPasswordSignIn() {
 
   return (
     <View style={{ gap: 12 }}>
+      {forgot ? (
+        <Text style={{ fontFamily: fonts.sansBold, fontSize: 17, color: palette.ink }}>
+          {t("auth.forgotTitle")}
+        </Text>
+      ) : null}
       <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 22, color: palette.inkSoft }}>
-        {t("auth.signInBody")}
+        {forgot ? t("auth.forgotBody") : t("auth.signInBody")}
       </Text>
+
       <LabeledInput
         label="Email"
         value={email}
@@ -262,26 +272,70 @@ function EmailPasswordSignIn() {
         inputMode="email"
         autoCapitalize="none"
       />
-      <LabeledInput
-        label={t("auth.password")}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <PrimaryButton
-        label={t("auth.signInTitle")}
-        disabled={!email.includes("@") || password.length < 6 || busy}
-        onPress={() =>
-          submit(async () => {
-            const outcome = await signInWithPassword(email.trim(), password);
-            if (outcome === "confirm-email") setAwaitingEmail(email.trim());
-          })
-        }
-      />
-      <Text style={{ fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: palette.inkMuted }}>
-        {t("auth.passwordHint")}
-      </Text>
+
+      {/* Resetting needs only the address, so the password field and the
+          "we create your account on first sign-in" copy stay out of the way. */}
+      {forgot ? (
+        <>
+          {forgotSent ? (
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, lineHeight: 20, color: palette.green }}>
+              {t("auth.forgotSent")}
+            </Text>
+          ) : (
+            <PrimaryButton
+              label={t("auth.forgotSend")}
+              disabled={!email.includes("@") || busy}
+              onPress={() =>
+                submit(async () => {
+                  await requestPasswordReset(email.trim());
+                  setForgotSent(true);
+                })
+              }
+            />
+          )}
+          <Pressable
+            onPress={() => {
+              setForgot(false);
+              setForgotSent(false);
+              setError(null);
+            }}
+            style={{ paddingVertical: 6 }}
+          >
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.brick }}>
+              {t("auth.forgotBack")}
+            </Text>
+          </Pressable>
+        </>
+      ) : (
+        <>
+          <LabeledInput
+            label={t("auth.password")}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+          />
+          <PrimaryButton
+            label={t("auth.signInTitle")}
+            disabled={!email.includes("@") || password.length < 6 || busy}
+            onPress={() =>
+              submit(async () => {
+                const outcome = await signInWithPassword(email.trim(), password);
+                if (outcome === "confirm-email") setAwaitingEmail(email.trim());
+              })
+            }
+          />
+          <Text style={{ fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: palette.inkMuted }}>
+            {t("auth.passwordHint")}
+          </Text>
+          <Pressable onPress={() => setForgot(true)} style={{ paddingVertical: 4 }}>
+            <Text style={{ fontFamily: fonts.sansSemiBold, fontSize: 13.5, color: palette.brick }}>
+              {t("auth.forgotLink")}
+            </Text>
+          </Pressable>
+        </>
+      )}
+
       {error ? (
         <Text selectable style={{ fontFamily: fonts.sans, fontSize: 13, color: palette.brick }}>
           {error}

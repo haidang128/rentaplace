@@ -41,6 +41,10 @@ export default function RootLayout() {
     headerStyle: { backgroundColor: palette.paper },
     headerTintColor: palette.ink,
     headerShadowVisible: false,
+    // iOS takes the back label from the PREVIOUS screen's title, so an
+    // untitled parent (index, (tabs)) leaked its route name into the button.
+    // Nothing here has a visible title anyway, so show the chevron alone.
+    headerBackButtonDisplayMode: "minimal",
   } as const;
 
   return (
@@ -69,6 +73,7 @@ export default function RootLayout() {
           <Stack.Screen name="contract/[listingId]" options={subHeader} />
           <Stack.Screen name="delete-account" options={subHeader} />
           <Stack.Screen name="confirmed" options={subHeader} />
+          <Stack.Screen name="reset-password" options={subHeader} />
         </Stack>
       </AuthProvider>
     </LangProvider>

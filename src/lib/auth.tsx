@@ -42,6 +42,8 @@ const DEMO_SESSION_KEY = "rentaplace.demo-session";
 /** Sentinel thrown for a wrong password; the UI swaps it for a translated string. */
 export const WRONG_PASSWORD = "auth.wrongPassword";
 
+const RESET_REDIRECT = `${process.env.EXPO_PUBLIC_WEB_URL ?? "https://rentaplace.expo.app"}/reset-password`;
+
 const CONFIRM_REDIRECT = `${process.env.EXPO_PUBLIC_WEB_URL ?? "https://rentaplace.expo.app"}/confirmed`;
 
 /**
@@ -58,6 +60,11 @@ type AuthContextValue = {
   signInDemo: (persona: keyof typeof demoPersonas) => void;
   /** Real mode: email + password. Signs up automatically on first login. */
   signInWithPassword: (email: string, password: string) => Promise<SignInOutcome>;
+  /** Email a recovery link. Resolves even for an unknown address, so the call
+   *  cannot be used to find out which emails have accounts. */
+  requestPasswordReset: (email: string) => Promise<void>;
+  /** Set a new password for the session the recovery link established. */
+  updatePassword: (password: string) => Promise<void>;
   /** Re-send the signup confirmation email (rate-limited by Supabase). */
   resendConfirmation: (email: string) => Promise<void>;
   /** Real mode: renter -> landlord self-serve upgrade (server-enforced, never admin). */
@@ -140,6 +147,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const requestPasswordReset = useCallback(async (email: string) => {
+    if (isDemoMode) return;
+    const { error } = await supabase!.auth.resetPasswordForEmail(email, {
+      redirectTo: RESET_REDIRECT,
+    });
+    // Supabase does not reveal whether the address exists, and neither do we:
+    // the screen says the same thing either way. Only surface real failures,
+    // such as the rate limit on the shared mail sender.
+    if (error) throw error;
+  }, []);
+
+  const updatePassword = useCallback(async (password: string) => {
+    if (isDemoMode) return;
+    const { data, error } = await supabase!.auth.updateUser({ password });
+    if (error) throw error;
+    // The recovery link already signed them in, so refresh the profile rather
+    // than making them log in again with the password they just set.
+    if (data.user) setSession(await loadProfile(data.user.id));
+  }, []);
+
   const resendConfirmation = useCallback(async (email: string) => {
     if (isDemoMode) return;
     const { error } = await supabase!.auth.resend({
@@ -188,8 +215,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ session, ready, signInDemo, signInWithPassword, resendConfirmation, becomeLandlord, signOut, deleteAccount }),
-    [session, ready, signInDemo, signInWithPassword, resendConfirmation, becomeLandlord, signOut, deleteAccount],
+    () => ({ session, ready, signInDemo, signInWithPassword, requestPasswordReset, updatePassword, resendConfirmation, becomeLandlord, signOut, deleteAccount }),
+    [session, ready, signInDemo, signInWithPassword, requestPasswordReset, updatePassword, resendConfirmation, becomeLandlord, signOut, deleteAccount],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;
