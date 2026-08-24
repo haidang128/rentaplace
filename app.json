@@ -2,7 +2,7 @@
   "expo": {
     "name": "RentAPlace",
     "slug": "rentaplace",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rentaplace",
@@ -31,6 +31,14 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "RentAPlace needs your photos so you can add pictures of the room to your listing.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       [
         "expo-splash-screen",
         {
