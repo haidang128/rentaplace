@@ -32,7 +32,8 @@ function mapListing(row: any): Listing {
     depositAmount: row.deposit_amount,
     billsIncluded: row.bills_included,
     vietnameseFlatmates: row.vietnamese_flatmates,
-    nearUniversity: row.near_university,
+    // Nullable in the DB: pre-toggle clients still write null (see migration 12).
+    nearUniversity: row.near_university ?? false,
     liveInLandlord: row.live_in_landlord,
     availableFrom: row.available_from,
     description: row.description,
