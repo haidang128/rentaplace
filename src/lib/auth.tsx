@@ -39,6 +39,9 @@ export const demoPersonas: Record<string, Session> = {
 const DEMO_SESSION_KEY = "rentaplace.demo-session";
 
 /** Where the confirmation email's link lands — the web app serves /confirmed. */
+/** Sentinel thrown for a wrong password; the UI swaps it for a translated string. */
+export const WRONG_PASSWORD = "auth.wrongPassword";
+
 const CONFIRM_REDIRECT = `${process.env.EXPO_PUBLIC_WEB_URL ?? "https://rentaplace.expo.app"}/confirmed`;
 
 /**
@@ -114,13 +117,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           password,
           options: { emailRedirectTo: CONFIRM_REDIRECT },
         });
+        // The email is taken, so this was never a first visit — the sign-in
+        // above failed because the password is wrong. Saying "User already
+        // registered" here describes the signUp we attempted, not the problem
+        // the person actually has, and leaves them with nothing to act on.
+        if (
+          signUpError?.code === "user_already_exists" ||
+          signUpError?.message?.toLowerCase().includes("already registered")
+        ) {
+          throw new Error(WRONG_PASSWORD);
+        }
         if (signUpError) throw signUpError;
         if (data.session) return "signed-in"; // auto-confirm on
         // Confirmation required: a genuinely new user carries identities; an
         // already-registered email comes back as an obfuscated stub without
         // any — which here means the password was wrong.
         if (data.user?.identities?.length) return "confirm-email";
-        throw error;
+        throw new Error(WRONG_PASSWORD);
       }
       throw error;
     },

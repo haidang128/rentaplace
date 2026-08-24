@@ -306,7 +306,8 @@
     "confirmedSignedInBody": "Your account is ready and you're signed in.",
     "confirmedErrorTitle": "Link expired",
     "confirmedErrorBody": "This confirmation link has expired or was already used. Sign in with your email and password — you can resend the email from there.",
-    "confirmedGoProfile": "Go to your profile"
+    "confirmedGoProfile": "Go to your profile",
+    "wrongPassword": "That email is already registered, but the password does not match. Check the password and try again."
   },
   "deleteAccount": {
     "menuLink": "Delete my account",

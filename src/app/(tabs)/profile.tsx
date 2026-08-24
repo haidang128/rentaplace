@@ -6,7 +6,7 @@ import { LabeledInput, PrimaryButton } from "@/components/form";
 import { Seal } from "@/components/seal";
 import { BlockedList } from "@/components/blocked-list";
 import { fonts, palette, radius } from "@/constants/theme";
-import { useAuth } from "@/lib/auth";
+import { useAuth, WRONG_PASSWORD } from "@/lib/auth";
 import { useLang } from "@/lib/i18n";
 import { isDemoMode } from "@/lib/supabase";
 
@@ -193,7 +193,8 @@ function EmailPasswordSignIn() {
     try {
       await action();
     } catch (e: any) {
-      setError(String(e?.message ?? e));
+      const raw = String(e?.message ?? e);
+      setError(raw === WRONG_PASSWORD ? t("auth.wrongPassword") : raw);
     } finally {
       setBusy(false);
     }

@@ -306,7 +306,8 @@
     "confirmedSignedInBody": "Tài khoản của bạn đã sẵn sàng và bạn đã đăng nhập.",
     "confirmedErrorTitle": "Liên kết đã hết hạn",
     "confirmedErrorBody": "Liên kết xác nhận này đã hết hạn hoặc đã được dùng. Hãy đăng nhập bằng email và mật khẩu — bạn có thể gửi lại email từ đó.",
-    "confirmedGoProfile": "Đến trang cá nhân"
+    "confirmedGoProfile": "Đến trang cá nhân",
+    "wrongPassword": "Email này đã được đăng ký, nhưng mật khẩu không đúng. Vui lòng kiểm tra lại mật khẩu."
   },
   "deleteAccount": {
     "menuLink": "Xóa tài khoản của tôi",
