@@ -226,7 +226,9 @@
     "title": "Tìm phòng",
     "filterFlatmates": "Người Việt ở cùng",
     "filterPrice": "Giá ≤ £600",
-    "filterNearUni": "Gần trường"
+    "filterNearUni": "Gần trường",
+    "noMatches": "Không có phòng nào khớp với bộ lọc này.",
+    "clearFilters": "Xoá bộ lọc"
   },
   "landlordProfile": {
     "title": "Hồ sơ chủ nhà",
@@ -389,7 +391,9 @@
     "editTitle": "Sửa tin đăng",
     "saveChanges": "Lưu thay đổi",
     "submittedTitle": "Đã gửi!",
-    "submittedBody": "Đội RentAPlace sẽ hẹn chụp ảnh thật và duyệt tin trong 48 giờ."
+    "submittedBody": "Đội RentAPlace sẽ hẹn chụp ảnh thật và duyệt tin trong 48 giờ.",
+    "fieldNearUni": "Gần trường đại học",
+    "nearUniHint": "Đi bộ hoặc đi xe buýt một đoạn ngắn là tới trường."
   },
   "admin": {
     "title": "Hàng chờ kiểm duyệt",

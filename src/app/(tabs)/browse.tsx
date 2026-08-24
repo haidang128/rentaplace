@@ -107,6 +107,30 @@ export default function BrowseScreen() {
           </View>
         </View>
       }
+      ListEmptyComponent={
+        <View style={{ gap: 10, paddingTop: 20, alignItems: "flex-start" }}>
+          <Text style={{ fontFamily: fonts.sans, fontSize: 14, lineHeight: 21, color: palette.inkMuted }}>
+            {t("browse.noMatches")}
+          </Text>
+          {filters.size > 0 ? (
+            <Pressable
+              onPress={() => setFilters(new Set())}
+              style={{
+                paddingHorizontal: 14,
+                paddingVertical: 9,
+                borderRadius: 999,
+                borderWidth: 1.5,
+                borderColor: palette.lineStrong,
+                backgroundColor: "#fff",
+              }}
+            >
+              <Text style={{ fontFamily: fonts.sansBold, fontSize: 13, color: palette.inkSoft }}>
+                {t("browse.clearFilters")}
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+      }
       renderItem={({ item }) => (
         <ListingCard
           listing={item}

@@ -42,7 +42,8 @@ export type Listing = {
   depositAmount: number;
   billsIncluded: boolean;
   vietnameseFlatmates: number;
-  nearUniversity: string | null;
+  /** Landlord says the room is within easy reach of a university. */
+  nearUniversity: boolean;
   /** Lodger branch — deposit protection law does not apply. */
   liveInLandlord: boolean;
   availableFrom: string | null;

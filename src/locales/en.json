@@ -226,7 +226,9 @@
     "title": "Browse",
     "filterFlatmates": "Vietnamese flatmates",
     "filterPrice": "Price ≤ £600",
-    "filterNearUni": "Near university"
+    "filterNearUni": "Near university",
+    "noMatches": "No rooms match these filters.",
+    "clearFilters": "Clear filters"
   },
   "landlordProfile": {
     "title": "Landlord profile",
@@ -389,7 +391,9 @@
     "editTitle": "Edit listing",
     "saveChanges": "Save changes",
     "submittedTitle": "Submitted!",
-    "submittedBody": "The RentAPlace team will arrange real photos and review your listing within 48 hours."
+    "submittedBody": "The RentAPlace team will arrange real photos and review your listing within 48 hours.",
+    "fieldNearUni": "Near a university",
+    "nearUniHint": "Walking distance or a short bus ride to a university campus."
   },
   "admin": {
     "title": "Review queue",

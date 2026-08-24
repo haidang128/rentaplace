@@ -47,6 +47,7 @@ export function ListingForm({
   const [roomType, setRoomType] = useState<RoomType>(initial?.roomType ?? "double");
   const [bills, setBills] = useState(initial?.billsIncluded ?? true);
   const [flatmates, setFlatmates] = useState(String(initial?.vietnameseFlatmates ?? 0));
+  const [nearUni, setNearUni] = useState(initial?.nearUniversity ?? false);
   const [liveIn, setLiveIn] = useState(initial?.liveInLandlord ?? false);
   const [availableFrom, setAvailableFrom] = useState(initial?.availableFrom ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
@@ -108,6 +109,14 @@ export function ListingForm({
         value={flatmates}
         onChangeText={setFlatmates}
         inputMode="numeric"
+      />
+
+      {/* Renters filter on this in Browse, so it has to be answerable here. */}
+      <ToggleRow
+        label={t("listingForm.fieldNearUni")}
+        hint={t("listingForm.nearUniHint")}
+        value={nearUni}
+        onChange={setNearUni}
       />
 
       {/* Lodger branch — transparent up front, drives the lodger guide on the listing */}
@@ -190,7 +199,7 @@ export function ListingForm({
               depositAmount: depositNum,
               billsIncluded: bills,
               vietnameseFlatmates: parseInt(flatmates, 10) || 0,
-              nearUniversity: initial?.nearUniversity ?? null,
+              nearUniversity: nearUni,
               liveInLandlord: liveIn,
               availableFrom: availableFrom.trim() || null,
               description: description.trim(),
